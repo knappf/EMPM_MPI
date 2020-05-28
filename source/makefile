@@ -1,6 +1,6 @@
 
 all:
-#	@$(MAKE) -C HFB_code  
+	@$(MAKE) -C HFB_code  
 	@$(MAKE) -C fmat
 	@$(MAKE) -C tda
 	@$(MAKE) -C phon_dens1
@@ -22,7 +22,7 @@ phon_dens1:
 	@$(MAKE) -C phon_dens1
 
 clean:
-#	@$(MAKE) clean -C HFB_code
+	@$(MAKE) clean -C HFB_code
 	@$(MAKE) clean -C fmat
 	@$(MAKE) clean -C tda
 	@$(MAKE) clean -C phon_dens1
