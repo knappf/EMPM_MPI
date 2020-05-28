@@ -1,3 +1,6 @@
+# extract directory structure from empm.tar.gz
+tar -xvzf empm.tar.gz
+
 # go to source folder
 cd source 
 
