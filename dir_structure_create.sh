@@ -1,4 +1,4 @@
-tar -xzf empm.tar.gz
+tar -xzvf empm.tar.gz
 rm empm.tar.gz
 
 
