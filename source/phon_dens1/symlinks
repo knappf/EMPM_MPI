@@ -1,0 +1,6 @@
+export CESTA="/data/knapp/phonon_O16_HF_vlk_arg"
+
+ln -s $CESTA/tda_pn_coup/1phonon/1f_* $CESTA/phon_dens1/1phonon/
+ln -s $CESTA/tda_pn_coup/singpart_coup.dat $CESTA/phon_dens1/
+
+

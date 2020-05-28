@@ -1,0 +1,18 @@
+ifort -O3 -parallel  -c phon_dens1_part_cut.f
+phon_dens1_part_cut.f(37): error #5149: Illegal character in statement label field  [e]
+error
+^
+phon_dens1_part_cut.f(37): error #5149: Illegal character in statement label field  [r]
+error
+-^
+phon_dens1_part_cut.f(37): error #5149: Illegal character in statement label field  [r]
+error
+--^
+phon_dens1_part_cut.f(37): error #5149: Illegal character in statement label field  [o]
+error
+---^
+phon_dens1_part_cut.f(37): error #5149: Illegal character in statement label field  [r]
+error
+----^
+compilation aborted for phon_dens1_part_cut.f (code 1)
+make: *** [phon_dens1_part_cut.o] Error 1

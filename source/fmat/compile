@@ -1,0 +1,1 @@
+ifort anglib.f90 fmat_uni.f90 -o fmat

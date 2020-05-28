@@ -1,0 +1,7 @@
+export CESTA="/home/frantisek/calcul/phonon_O16_HF_N3"
+
+ln -s $CESTA/phon_dens1/1phonon/1f_* $CESTA/phon_int/1phonon/
+ln -s $CESTA/tda_pn_coup/singpart_coup.dat $CESTA/phon_int/
+ln -s $CESTA/tda_pn_coup/f_* $CESTA/phon_int/
+
+

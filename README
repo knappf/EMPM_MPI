@@ -1,0 +1,10 @@
+# go to source folder
+cd source 
+
+# edit file configure_compilers.sh to define path to compilers and type
+source ./configure_compilers.sh
+
+# to compile type 
+
+make clean
+make 

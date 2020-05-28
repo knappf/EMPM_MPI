@@ -1,0 +1,16 @@
+! Name of s.p. file
+                    
+! Name of interaction file
+                          
+! Name of output proton interaction file
+        fmat_p.dat
+! Name of output neutron interaction file
+        fmat_n.dat
+! Name of output proton-neutron interaction file
+        fmat_pn.dat
+! Name of output proton CM interaction file
+        fmat_cm_p.dat
+! Name of output neutron interaction file
+        fmat_cm_n.dat
+! Name of output proton-neutron interaction file
+        fmat_cm_pn.dat

@@ -1,0 +1,69 @@
+c     last update 16.11.2010
+
+      program nondiag
+      
+      use phoninteracn
+
+
+      implicit double precision (a-h,o-z)
+      
+      include 'types_ndgi_int.inc'
+      include 'input_ndgi_int.inc'
+      include 'formats_ndgi_int.inc'
+      
+      type(level_typ),dimension(:), allocatable :: levn,levp 
+      
+     
+      xrotrunc=1.d-10
+      
+      write(*,*)'Loading of input '
+
+      open(1,file='input_eqm_coup.dat',status='old',form='formatted')
+            
+      read(1,15)ia,iz
+      read(1,15)ihnmn,ihnmx
+      read(1,15)ihpmn,ihpmx
+      read(1,15)ipnmn,ipnmx
+      read(1,15)ippmn,ippmx
+      read(1,26)alfa,beta
+      read(1,*)
+      read(1,15)iparmn,iparmx
+      read(1,15)jmin,jmax
+      close(1)
+
+      allocate(levn(ipnmx),levp(ippmx))
+
+
+      open(1,file='singpart_coup.dat',status='old',form='formatted')
+
+      read(1,*)
+      read(1,*)
+
+      do i=1,ipnmx
+       read(1,16)nt,lt,jt,erspnt,ersppt
+       levn(i)%n=nt
+       levn(i)%l=lt
+       levn(i)%j=jt
+      enddo
+      
+      rewind(1)
+      
+      read(1,*)
+      read(1,*)
+
+      do i=1,ippmx
+       read(1,16)nt,lt,jt,erspnt,ersppt
+       levp(i)%n=nt
+       levp(i)%l=lt
+       levp(i)%j=jt
+      enddo
+
+      close(1)
+
+
+       call vintn1(2,levn,levp)
+       call vintn2
+       call vintn1(3,levn,levp)
+
+
+      end
