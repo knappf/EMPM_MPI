@@ -24,3 +24,12 @@ echo "EMPM 2-phonon calculation"
 # 
 echo "EMPM 3-phonon calculation"
 ./run_eqm3.sh
+# 
+echo "Nondiagonal interaction"
+cd nondiag
+./nondiag # optionally ./nondiag < input 
+#
+echo "Complete diagonalization"
+cd ..
+cd fullham
+./fullham # input J, Parity and Nph
