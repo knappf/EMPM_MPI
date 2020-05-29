@@ -13,6 +13,14 @@ all:
 	@$(MAKE) -C nondiag
 	@$(MAKE) -C fullham
 
+HFB:
+	@$(MAKE) clean -C HFB_code
+	@$(MAKE) -C HFB_code
+
+fmat:
+	@$(MAKE) clean -C fmat
+	@$(MAKE) -C fmat
+
 tda:
 	@$(MAKE) clean -C tda
 	@$(MAKE) -C tda
@@ -20,6 +28,30 @@ tda:
 phon_dens1:
 	@$(MAKE) clean -C phon_dens1
 	@$(MAKE) -C phon_dens1
+
+phon_int:
+	@$(MAKE) clean -C phon_int
+	@$(MAKE) -C phon_int
+
+eqm2_svd:
+	@$(MAKE) clean -C eqm2_MPI/eqm2_svd
+	@$(MAKE) -C eqm2_MPI/eqm2_svd
+
+eqm2_admat:
+	@$(MAKE) clean -C eqm2_MPI/eqm2_admat
+	@$(MAKE) -C eqm2_MPI/eqm2_admat
+
+eqm3_svd:
+	@$(MAKE) clean -C eqm3_MPI/eqm3_svd
+	@$(MAKE) -C eqm3_MPI/eqm3_svd
+
+eqm3_admat:
+	@$(MAKE) clean -C eqm3_MPI/eqm3_admat
+	@$(MAKE) -C eqm3_MPI/eqm3_admat
+
+phon_dens2:
+	@$(MAKE) clean -C eqm3_MPI/phon_dens2_MPI
+	@$(MAKE) -C eqm3_MPI/phon_dens2_MPI
 
 clean:
 	@$(MAKE) clean -C HFB_code
