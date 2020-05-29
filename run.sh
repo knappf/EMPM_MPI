@@ -3,7 +3,7 @@ source mpi_openmp_set.sh
 # HFB code 
 echo "HF calculation"
 cd input 
-#./HFB_DD > log_HFB
+./HFB_DD > log_HFB
 #
 echo "F matrix calculation"
 cd ../fmat
