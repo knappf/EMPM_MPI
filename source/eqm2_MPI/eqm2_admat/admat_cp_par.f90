@@ -177,7 +177,6 @@
        iii=mxtr(i)
        iaa=phonbs(iii)%ilap  ! 1phonon index
        ia=phonbs(iii)%ila    ! n-1 phonon index
-       write(912,*)' **** ',i,iaa,ia
 
       enddo
 
@@ -210,7 +209,6 @@
        d_m=0.d0
 
        iii=mxtr(i)
-       write(725,*)' **** ',i,idphontr
        iaa=phonbs(iii)%ilap  ! 1phonon index
        ia=phonbs(iii)%ila    ! n-1 phonon index
        jila=phon1(iaa)%j
