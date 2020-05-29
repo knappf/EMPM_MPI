@@ -1,5 +1,4 @@
-# Basic manual 
-# HOW to extract and compile EMPM codes
+# HOWTO EMPM codes
 # extract directory structure from empm.tar.gz
 tar -xvzf empm.tar.gz
 
