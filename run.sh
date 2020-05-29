@@ -1,4 +1,4 @@
-
+########################
 source mpi_openmp_set.sh
 # HFB code 
 echo "HF calculation"

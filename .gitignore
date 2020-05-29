@@ -1,3 +1,5 @@
+*.mod
+*.o
 en_2phon_trun.dat
 en_3phon_trun.dat
 input_Fmat.dat
@@ -73,3 +75,15 @@ tda/phon_struct.dat
 tda/r1Y1_n.dat
 tda/r1Y1_p.dat
 tda/singpart_coup.dat
+eqm2_MPI/eqm_admat
+eqm2_MPI/eqm_svd
+eqm3_MPI/eqm3_admat
+eqm3_MPI/eqm3_svd
+eqm3_MPI/phon_dens2_MPI
+fmat/fmat
+fullham/fullham
+input/HFB_DD
+nondiag/nondiag
+phon_dens1/phon_dens1_MPI
+phon_int/phon_int_MPI
+tda/tda
