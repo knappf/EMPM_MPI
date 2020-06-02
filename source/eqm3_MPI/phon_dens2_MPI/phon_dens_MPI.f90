@@ -41,6 +41,8 @@ call MPI_COMM_SIZE( MPI_COMM_WORLD, numprocs, ierr )
       
 !      write(*,*)'Loading of input '
 
+!      open(63,file='2_phon_dens_calc.dat',status='old',form='formatted',position='append')
+
       open(1,file='input_tda_coup.dat',status='old',form='formatted')
             
       read(1,15)ia,iz

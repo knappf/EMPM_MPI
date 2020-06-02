@@ -10,6 +10,7 @@
       use read_admat
       use hami
       use cm_ort_svd
+      use dens_list
 
       implicit double precision (a-h,o-z)
 
@@ -57,7 +58,7 @@
       open(99,file='3phon.log',status='unknown',form='formatted')
       open(892,file=' phonon_base.dat',status='unknown',form='formatted')
 
-      
+            
       call execute_command_line('rm 2_phon_dens_list.dat')
 
       ipmin=-1
@@ -81,9 +82,18 @@
 
 !      stop
 
-      CALL execute_command_line('./run_dens2.sh' )           
+      open(62,file='2_phon_dens_calc.dat',status='unknown',form='formatted')
+      close(62)
+      call create_dens_list
+ 
+      call execute_command_line('cp 2_phon_dens_calc_new.dat 2_phon_dens_list.dat')
+
+      call execute_command_line('./run_dens2.sh' )
+
+      call execute_command_line('cat 2_phon_dens_calc_myid* >> 2_phon_dens_calc.dat')
+      call execute_command_line('rm 2_phon_dens_calc_myid*')
+
       write(*,*)'2-phon dens. calculated'
-!      stop
 
 
       do ipar=ipmin,ipmax,2 !,-2

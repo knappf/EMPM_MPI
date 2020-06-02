@@ -1,6 +1,6 @@
 
 all:
-	@$(MAKE) -C HFB_code  
+#	@$(MAKE) -C HFB_code  
 	@$(MAKE) -C fmat
 	@$(MAKE) -C tda
 	@$(MAKE) -C phon_dens1
@@ -54,7 +54,7 @@ phon_dens2:
 	@$(MAKE) -C eqm3_MPI/phon_dens2_MPI
 
 clean:
-	@$(MAKE) clean -C HFB_code
+#	@$(MAKE) clean -C HFB_code
 	@$(MAKE) clean -C fmat
 	@$(MAKE) clean -C tda
 	@$(MAKE) clean -C phon_dens1

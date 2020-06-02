@@ -7,8 +7,8 @@ OPT= -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 EXF= eqm3_svd
 EXE_PATH=../../../eqm3_MPI/
 #
-all: types_eqm.o input_sp.o anglib.o base.o read_admat.o choles.o cm_ort_svd.o ham.o dmat_test.o eqm.o 
-	$(XLF) types_eqm.o input_sp.o anglib.o base.o read_admat.o choles.o cm_ort_svd.o ham.o dmat_test.o eqm.o ${OPT} -o ${EXE_PATH}${EXF}
+all: types_eqm.o input_sp.o anglib.o base.o dens_list.o read_admat.o choles.o cm_ort_svd.o ham.o dmat_test.o eqm.o 
+	$(XLF) types_eqm.o input_sp.o anglib.o base.o dens_list.o read_admat.o choles.o cm_ort_svd.o ham.o dmat_test.o eqm.o ${OPT} -o ${EXE_PATH}${EXF}
 
 types_eqm.o: types_eqm.f90
 	${XLF} -c types_eqm.f90
@@ -21,6 +21,9 @@ anglib.o: anglib.f90
 
 base.o: base.f90
 	${XLF} -c base.f90
+
+dens_list.o: dens_list.f90
+	${XLF} -c dens_list.f90
 
 read_admat.o: read_admat.f90
 	${XLF} -c read_admat.f90	

@@ -36,7 +36,9 @@ include 'types_phon_dens.inc'
       character(len=30) fnamex,fnamec
       character(len=30) fnamer1,fnamer2,fnamer,fnameo
       character(len=10) fnamern,name_new
+      character(len=10) myid_name
       integer*8 ndimroc,iroc
+
 
       integer myid,numprocs
       integer, dimension(:), allocatable :: ig_resh
@@ -46,6 +48,11 @@ include 'types_phon_dens.inc'
       open(32,file='2phonon/2f_rnp.dat',status='unknown',form='unformatted')
       open(34,file='2phonon/2f_rph.dat',status='unknown',form='unformatted')
       open(43,file='2phonon/2f_rpp.dat',status='unknown',form='unformatted')
+
+
+      write(myid_name,'(i10.10)')myid
+      open(63,file='2_phon_dens_calc_myid_'//myid_name,status='unknown',form='formatted')
+      
 
       jjmx=jamax
 
@@ -275,6 +282,10 @@ include 'types_phon_dens.inc'
 !write(836,*)r2nh(ii)%rho
 !end do
       endif
+!      call MPI_BARRIER(MPI_COMM_WORLD, ierr) 
+!      open(63,file='2_phon_dens_calc.dat',status='old',form='formatted',access='append')
+       write(63,*)iaaa
+!      close(63)
  enddo   ! ia_cal
 
 return
