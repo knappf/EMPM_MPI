@@ -82,6 +82,8 @@
 
 !      stop
 
+
+!   test 
       open(62,file='2_phon_dens_calc.dat',status='unknown',form='formatted')
       close(62)
       call create_dens_list
