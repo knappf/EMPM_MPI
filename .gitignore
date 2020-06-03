@@ -1,4 +1,13 @@
 *.mod
 *.o
-run
+run/scratch
+run/eqm3_MPI
+run/eqm2_MPI
+run/fmat
+run/fullham
+run/input
+run/nondiag
+run/phon_dens1
+run/phon_int
+run/tda
 .vscode/launch.json
