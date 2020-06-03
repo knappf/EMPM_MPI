@@ -33,9 +33,6 @@
       character*30 namex,names,namec
 
 
-
-!      CALL OMP_SET_NUM_THREADS(22)
-
       nf=3  
       nlam=0
 
@@ -80,10 +77,7 @@
         enddo
       enddo  
 
-!      stop
-
-
-!   test 
+      
       open(62,file='2_phon_dens_calc.dat',status='unknown',form='formatted')
       close(62)
       call create_dens_list
@@ -120,7 +114,6 @@
       idphontot=idphon
 
       if (idphon.gt.0) then 
-!      CALL execute_command_line('./run_dens2.sh' )      
 
 ! calculation of matrices A and D
 !       call admat(nf,ipar,jcal,phonbs,idphon,no,phon1,phon2,mxt,xcc,ndcc,ipozx,ndbx)
