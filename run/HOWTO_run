@@ -1,0 +1,5 @@
+# extract directory structure from empm.tar.gz to create directory structure 
+tar -xvzf empm.tar.gz
+
+# run EMPM calculation 
+./run.sh
