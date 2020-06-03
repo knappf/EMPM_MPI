@@ -2,6 +2,12 @@
 # extract directory structure from empm.tar.gz
 tar -xvzf empm.tar.gz
 
+# on Metacentrum load modules 
+module add intelcdk-19.0.4
+module add openmpi-1.8.2-intel
+module rm intelcdk-15
+
+
 # go to source folder
 cd source 
 
