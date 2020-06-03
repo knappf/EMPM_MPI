@@ -1,3 +1,6 @@
+# to clone from git 
+# git clone --branch devel https://github.com/knappf/EMPM_MPI.git ./
+
 # HOWTO EMPM codes
 # extract directory structure from empm.tar.gz
 tar -xvzf empm.tar.gz
