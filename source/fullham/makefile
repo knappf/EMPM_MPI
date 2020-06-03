@@ -4,7 +4,7 @@
 OPT= -L$MKLPATH -I$MKLINCLUDE -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 # exe file
 EXF= fullham
-EXE_PATH=../../fullham/
+EXE_PATH=../../run/fullham/
 #
 all: fullmat.o fullham.o
 	$(XLF) fullmat.o fullham.o ${OPT} -o ${EXE_PATH}${EXF}
