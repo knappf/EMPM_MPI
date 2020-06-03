@@ -4,5 +4,5 @@ Set of fortran codes for nuclear strucuture calculations within Equation of Moti
 [1] https://doi.org/10.1103/PhysRevC.95.024306
 
 
-# to clone from git 
-# git clone --branch devel https://github.com/knappf/EMPM_MPI.git ./
+to clone from git 
+git clone --branch devel https://github.com/knappf/EMPM_MPI.git ./
