@@ -1,0 +1,11 @@
+
+# edit file configure_compilers.sh to define path to compilers and type
+source ./configure_compilers.sh
+
+# compilation and build executables 
+make clean
+make 
+
+# run EMPM calculation 
+cd ../run
+./run.sh
