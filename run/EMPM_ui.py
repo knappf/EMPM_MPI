@@ -462,7 +462,9 @@ os.system('ln -s inputs/mpi_openmp_set.sh')
 ###############
 ###input#####
 ###############
-os.system('cp inputs/input.dat hf/')
+#os.system('cp inputs/input.dat hf/')
+
+os.system('ln -s ../inputs/input.dat hf/')
 os.system('ln -s ../inputs/vlk.dat hf/')
 
 
@@ -470,8 +472,9 @@ os.system('ln -s ../inputs/vlk.dat hf/')
 #####fmat#########
 ###############
 
-os.system('cp inputs/input_tda_coup.dat tda/')
+#os.system('cp inputs/input_tda_coup.dat tda/')
 
+os.system('ln -s ../inputs/input_tda_coup.dat tda/')
 os.system('ln -s ../fmat/fmat_n.dat tda/')
 os.system('ln -s ../fmat/fmat_p.dat tda/')
 os.system('ln -s ../fmat/fmat_pn.dat tda/')
@@ -495,7 +498,8 @@ outputfile2.write('! Name of output neutron-proton interaction file\n')
 outputfile2.write('        fmat_np.dat\n')
 
 outputfile2.close()
-os.system('cp inputs/input_space fmat/')
+#os.system('cp inputs/input_space fmat/')
+os.system('ln -s ../inputs/input_space fmat/')
 os.system('ln -s ../hf/HF_n.dat fmat/')
 os.system('ln -s ../hf/HF_p.dat fmat/')
 os.system('ln -s ../hf/vlk_hfb.dat fmat/')
