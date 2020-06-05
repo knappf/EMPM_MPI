@@ -9,6 +9,10 @@ source ./configure_compilers.sh
 make clean
 make 
 
-# run EMPM calculation 
+
 cd ../run
+# run UI script to create dir structure and input files
+./EMPM_ui.py
+
+# run EMPM calculation 
 ./run.sh

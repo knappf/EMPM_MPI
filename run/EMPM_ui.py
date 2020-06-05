@@ -38,7 +38,7 @@ outputfileMPI.write('echo $NUM_MPI_PROCS \n')
 outputfileMPI.write('# number of OMP threads \n')
 outputfileMPI.write(lineOMP)
 outputfileMPI.write('\n')
-outputfileMPI.write('#echo "# OMP threads"\n')
+outputfileMPI.write('echo "# OMP threads"\n')
 outputfileMPI.write('echo $OMP_NUM_THREADS\n')
 
 outputfileMPI.close()
@@ -114,13 +114,13 @@ HF_inputs={
 "max_p":10,
 "max_n":10,
 "max_Y":10,
-"hw":16.0,
+"hw":16.3,
 "s3":0.0,
 "s3Y":1.0,
 "if_ort":1,
 "if_self":0,
 "n_lam_occup":1,
-"if_NAT":1,
+"if_NAT":0,
 }
 
 while True: 
