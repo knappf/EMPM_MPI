@@ -4,7 +4,7 @@
 OPT= -L$MKLPATH -I$MKLINCLUDE -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 # exe file
 EXF= Hf
-EXE_PATH=../${EMPM_RUN_DIR}
+EXE_PATH=../${EMPM_BIN_DIR}
 #
 all: technical.o math.o geom.o int_arr.o inter_stor_dd.o hp_field.o hn_field.o fermi_energy_n.o fermi_energy_p.o Dp_field.o Dn_field.o make_sp_levels.o make_qsp_levels.o dimm.o read_input.o HFB_energy.o check_densities.o initialize_basis.o square_root.o deallocate_all.o gauss_int.o integral_R.o occupations.o interaction_unformatted_dd.o hfb_iteration_dd.o diagonalization.o diag_subspace.o kinetic.o power2.o ln_matrix.o R_val.o exp_matrix.o make_densities.o transf_interaction_new2_dd.o TDA_new2_DD.o phonon_density_calc.o transit_calc.o transit_calc_spur.o spur_vec.o transition.o NatOrb.o  NatOrb_transf_unf.o HFB_energy_NAT.o transit_calc_NO.o transit_calc_spur_NO.o radial.o TDA_NO.o HFB.o    
 	${XLF} technical.o math.o geom.o int_arr.o inter_stor_dd.o hp_field.o hn_field.o fermi_energy_n.o fermi_energy_p.o Dp_field.o Dn_field.o make_sp_levels.o make_qsp_levels.o dimm.o read_input.o HFB_energy.o check_densities.o initialize_basis.o square_root.o deallocate_all.o gauss_int.o integral_R.o occupations.o interaction_unformatted_dd.o hfb_iteration_dd.o diagonalization.o diag_subspace.o kinetic.o power2.o ln_matrix.o R_val.o exp_matrix.o make_densities.o transf_interaction_new2_dd.o TDA_new2_DD.o phonon_density_calc.o transit_calc.o transit_calc_spur.o spur_vec.o transition.o NatOrb.o  NatOrb_transf_unf.o HFB_energy_NAT.o transit_calc_NO.o transit_calc_spur_NO.o radial.o TDA_NO.o HFB.o ${OPT} -o ${EXE_PATH}${EXF}

@@ -6,7 +6,7 @@
 #OPT= -L$MKLPATH -I$MKLINCLUDE -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 # exe file
 EXF= phon_int_MPI
-EXE_PATH=../../${EMPM_RUN_DIR}
+EXE_PATH=../../${EMPM_BIN_DIR}
 #
 all: eof_mod.o input_sp.o anglib.o interac_part_fast5_cut.o phon_int.o
 	$(XLFMPI) eof_mod.o input_sp.o anglib.o interac_part_fast5_cut.o phon_int.o ${OPT} -o ${EXE_PATH}${EXF}

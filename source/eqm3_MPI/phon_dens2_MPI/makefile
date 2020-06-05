@@ -7,7 +7,7 @@
 #OPT= -L$MKLPATH -I$MKLINCLUDE -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 # exe file
 EXF= phon_dens2_MPI
-EXE_PATH=../../${EMPM_RUN_DIR}
+EXE_PATH=../../${EMPM_BIN_DIR}
 #
 all: anglib.o ro7_MPI.o input_sp.o phon_dens_MPI.o
 	${XLFMPI} anglib.o ro7_MPI.o input_sp.o phon_dens_MPI.o ${OPT} -o ${EXE_PATH}${EXF}

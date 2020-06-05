@@ -4,7 +4,7 @@
 #OPT= -L$MKLPATH -I$MKLINCLUDE -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 # exe file
 EXF= Fmat
-EXE_PATH=../${EMPM_RUN_DIR}
+EXE_PATH=../${EMPM_BIN_DIR}
 #
 all: anglib.o fmat_unfi.o 
 	$(XLF) anglib.o fmat_unfi.o ${OPT} -o ${EXE_PATH}${EXF}

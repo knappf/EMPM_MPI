@@ -5,7 +5,7 @@
 OPT= -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 # exe file
 EXF= eqm_svd
-EXE_PATH=../../${EMPM_RUN_DIR}
+EXE_PATH=../../${EMPM_BIN_DIR}
 #
 all: types_eqm.o input_sp.o anglib.o base.o read_admat.o choles.o cm_ort_svd.o ham.o dmat_test.o eqm.o 
 	$(XLF) types_eqm.o input_sp.o anglib.o base.o read_admat.o choles.o cm_ort_svd.o ham.o dmat_test.o eqm.o ${OPT} -o ${EXE_PATH}${EXF}

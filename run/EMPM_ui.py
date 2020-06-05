@@ -99,14 +99,15 @@ HF_inputs={
 "A":16,
 "Z":8,
 "noscmax":4,
-"noscmax12":8,
-"noscmax123":12,
+"noscmax12":0,
+"noscmax123":0,
 "if_2B":0,
 "if_QTDA":0,
-"tol":'1.0d-7',
+"tol":'1.0d-10',
 "qpp":1.0,
 "qnn":1.0,
 "qpn":1.0,
+"F":1.0,
 "min_p":1,
 "min_n":1,
 "min_Y":1,
@@ -165,7 +166,7 @@ line4=str(HF_inputs["min_p"])+','+ str(HF_inputs["max_p"])+ ',' + str(HF_inputs[
 line5=str(HF_inputs["if_QTDA"])+'   ! if_QTDA (= 0 for TDA, = 1 for QTDA)\n'
 line6=str(HF_inputs["tol"])+'   ! precision parameter\n'
 line7=str(HF_inputs["hw"])+'   ! hbar*omega [MeV]\n'
-line8=str(HF_inputs["qpp"])+','+str(HF_inputs["qnn"])+','+str(HF_inputs["qpn"]) + '   ! quenching of proton-proton, neutron-neutron, proton-neutron and F interaction\n'
+line8=str(HF_inputs["qpp"])+','+str(HF_inputs["qnn"])+','+str(HF_inputs["qpn"]) + ','+str(HF_inputs["F"]) + '   ! quenching of proton-proton, neutron-neutron, proton-neutron and F interaction\n'
 line9=str(HF_inputs["s3"])+ '   ! strength of the NNN interaction\n'
 line10=str(HF_inputs["s3Y"])+'    ! strength of the LambdaNN interaction\n'
 line11=str(HF_inputs["if_ort"])+'     ! if_ort (= 0 without orthog., = 1 with orthog)\n'
@@ -462,7 +463,7 @@ os.system('ln -s inputs/mpi_openmp_set.sh')
 ###input#####
 ###############
 os.system('cp inputs/input.dat hf/')
-os.system('ln -s ../vlk.dat hf/')
+os.system('ln -s ../inputs/vlk.dat hf/')
 
 
 ###############
@@ -601,38 +602,50 @@ os.system('ln -s ../nondiag/Vint_phon12.dat fullham/')
 os.system('ln -s ../nondiag/Vint_phon23.dat fullham/')
 os.system('ln -s ../nondiag/Vint_phon13.dat fullham/')
 
+# symbolic links to executables 
 
+os.system('ln -s ../../bin/Fmat fmat/')
+os.system('ln -s ../../bin/Hf hf/')
+os.system('ln -s ../../bin/phon_dens1_MPI eqm2_MPI/')
+os.system('ln -s ../../bin/phon_int_MPI eqm2_MPI/')
+os.system('ln -s ../../bin/eqm_admat eqm2_MPI/')
+os.system('ln -s ../../bin/eqm_svd eqm2_MPI/')
+os.system('ln -s ../../bin/eqm3_admat eqm3_MPI/')
+os.system('ln -s ../../bin/eqm3_svd eqm3_MPI/')
+os.system('ln -s ../../bin/phon_dens2_MPI eqm3_MPI/')
+os.system('ln -s ../../bin/Nondiag nondiag/')
+os.system('ln -s ../../bin/Fullham fullham/')
 
 
 #############################################
 ###### Move executable files from run directory##
 #############################################
-btda='mv '+bindir+'/Tda tda/' 
-bfmat='mv '+bindir+'/Fmat fmat/'
-binput='mv '+bindir+'/Hf hf/'
-bdens1='mv '+bindir+'/phon_dens1_MPI eqm2_MPI/'
-bint='mv '+bindir+'/phon_int_MPI eqm2_MPI/'
-beq2a='mv '+bindir+'/eqm_admat eqm2_MPI/'
-beq2s='mv '+bindir+'/eqm_svd eqm2_MPI/'
-beq3a='mv '+bindir+'/eqm3_admat eqm3_MPI/'
-beq3s='mv '+bindir+'/eqm3_svd eqm3_MPI/'
-beq3p='mv '+bindir+'/phon_dens2_MPI eqm3_MPI/'
-bnond='mv '+bindir+'/Nondiag nondiag/'
-bfullham='mv '+bindir+'/Fullham fullham/'
-#print btda
-os.system(btda)
-os.system(bfmat)
-os.system(binput)
-os.system(bdens1)
-os.system(bint)
-os.system(beq2a)
-os.system(beq2s)
-os.system(beq3a)
-os.system(beq3s)
-os.system(beq3p)
-os.system(bnond)
-os.system(bfullham)
+#btda='mv '+bindir+'/Tda tda/'
+ 
+#bfmat='mv '+bindir+'/Fmat fmat/'
+#binput='mv '+bindir+'/Hf hf/'
+#bdens1='mv '+bindir+'/phon_dens1_MPI eqm2_MPI/'
+#bint='mv '+bindir+'/phon_int_MPI eqm2_MPI/'
+#beq2a='mv '+bindir+'/eqm_admat eqm2_MPI/'
+#beq2s='mv '+bindir+'/eqm_svd eqm2_MPI/'
+#beq3a='mv '+bindir+'/eqm3_admat eqm3_MPI/'
+#beq3s='mv '+bindir+'/eqm3_svd eqm3_MPI/'
+#beq3p='mv '+bindir+'/phon_dens2_MPI eqm3_MPI/'
+#bnond='mv '+bindir+'/Nondiag nondiag/'
+#bfullham='mv '+bindir+'/Fullham fullham/'
 
+#os.system(btda)
+#os.system(bfmat)
+#os.system(binput)
+#os.system(bdens1)
+#os.system(bint)
+#os.system(beq2a)
+#os.system(beq2s)
+#os.system(beq3a)
+#os.system(beq3s)
+#os.system(beq3p)
+#os.system(bnond)
+#os.system(bfullham)
 
 os.system('chmod 777 run*')
 sys.exit()    

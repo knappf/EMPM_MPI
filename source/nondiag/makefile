@@ -5,7 +5,7 @@
 #OPT= -L$MKLPATH -I$MKLINCLUDE -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 # exe file
 EXF= Nondiag
-EXE_PATH=../${EMPM_RUN_DIR}
+EXE_PATH=../${EMPM_BIN_DIR}
 #
 all: anglib.o input_sp.o interacndg.o nondiag.o
 	$(XLF) anglib.o input_sp.o interacndg.o nondiag.o ${OPT} -o ${EXE_PATH}${EXF}
