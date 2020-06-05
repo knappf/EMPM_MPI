@@ -1,6 +1,6 @@
 *.mod
 *.o
-bin
+bin/
 run/eqm2_MPI
 run/eqm3_MPI
 run/fmat
