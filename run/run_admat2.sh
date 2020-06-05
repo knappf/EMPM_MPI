@@ -4,5 +4,3 @@ echo "Calculation of 2-phonon AD matrices"
 #/software/openmpi-1.8.2/intel/bin/mpirun -np $NUM_MPI_PROCS ./eqm_admat > log_ad 2>error_ad
 #source ../mpi_openmp_set.sh
 $MPIRUN_PATH/mpirun -np $NUM_MPI_PROCS ./eqm_admat > log_ad 2>error_ad
-
-

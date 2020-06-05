@@ -1,0 +1,6 @@
+     16     8 ! A,Z
+     1      3  !hole space for neutrons
+     1      3  !hole space for protns
+     4      10   !particle space for neutrons
+     4      10   !particle space for protons
+y    !Apply Gramm-Scmidt CM orthogonalzation?

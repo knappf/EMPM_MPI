@@ -3,4 +3,3 @@
 cd phon_dens1/
 source ../mpi_openmp_set.sh
 $MPIRUN_PATH/mpirun -np $NUM_MPI_PROCS ./phon_dens1_MPI > log_dens1 2>error
-

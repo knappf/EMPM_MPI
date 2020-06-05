@@ -5,7 +5,8 @@
 OPT= -L$MKLPATH -I$MKLINCLUDE -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 # exe file
 EXF= tda
-EXE_PATH=../../run/tda/
+#EXE_PATH=../../run/tda/
+EXE_PATH=${EMPM_RUN_DIR}
 #
 all: input_sp.o cm.o read_inter.o tda_pn_coupl_ortog.o
 	$(XLF) input_sp.o cm.o read_inter.o tda_pn_coupl_ortog.o ${OPT} -o ${EXE_PATH}${EXF}
