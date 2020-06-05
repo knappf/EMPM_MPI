@@ -623,7 +623,6 @@ bfullham='mv '+bindir+'/Fullham fullham/'
 os.system(btda)
 os.system(bfmat)
 os.system(binput)
-os.system(binput)
 os.system(bdens1)
 os.system(bint)
 os.system(beq2a)
