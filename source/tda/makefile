@@ -4,7 +4,7 @@
 # options
 OPT= -L$MKLPATH -I$MKLINCLUDE -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 # exe file
-EXF= TDA
+EXF= Tda
 #EXE_PATH=../../run/tda/
 EXE_PATH=../${EMPM_RUN_DIR}
 #

@@ -22,8 +22,8 @@ print "\n" \
 os.system('mkdir inputs')   
 outputfileMPI= open("inputs/mpi_openmp_set.sh", "w")
 
-n_nodes = input('Choose number of MPI nodes')
-n_th = input('Choose the  number of OMP threads')
+n_nodes = input('Set # of MPI nodes ')
+n_th = input('Set # of OMP threads ')
 
 
 lineMPI='export NUM_MPI_PROCS='+ str(n_nodes)
@@ -309,14 +309,14 @@ while True:
     else: 
         print "ILLEGAL INPUT"
 
-cm=raw_input("Apply Gramm-Scmidt CM orthogonalzation?: y/n") 
+cm=raw_input("Apply Gramm-Scmidt CM orthogonalzation?: y/n ") 
 
 line1='     '+str(HF_inputs["A"]) + '     ' + str(HF_inputs["Z"] )+ ' ! A,Z\n'
 line2='     '+str(TDA_inputs["minh_n"]) + '      ' + str(TDA_inputs["maxh_n"] )+ '  !hole space for neutrons\n'
 line3='     '+str(TDA_inputs["minh_p"]) + '      ' + str(TDA_inputs["maxh_p"] )+ '  !hole space for protns\n'
 line4='     '+str(TDA_inputs["minp_n"]) + '      ' + str(TDA_inputs["maxp_n"] )+ '   !particle space for neutrons\n'
 line5='     '+str(TDA_inputs["minp_p"]) + '      ' + str(TDA_inputs["maxp_p"] )+ '   !particle space for protons\n'
-line6=cm + '    !Apply Gramm-Scmidt CM orthogonalzation?'
+line6=cm + '    !Apply Gramm-Scmidt CM orthogonalzation? '
 
 outputfileTDA.write(line1)
 outputfileTDA.write(line2)
@@ -349,15 +349,15 @@ outputfile4.write('source mpi_openmp_set.sh\n')
 outputfile4.write('# HFB code\n')
 outputfile4.write('\n')
 outputfile4.write('echo "HF calculation" \n')
-outputfile4.write('cd input\n')
-outputfile4.write('./HFB_DD > log_HFB\n')
+outputfile4.write('cd hf\n')
+outputfile4.write('./Hf > log_HF\n')
 outputfile4.write('\n')                                                    
 outputfile4.write('echo "F matrix calculation"\n')
 outputfile4.write('cd ../fmat\n')
-outputfile4.write('./fmat < input_space > log_fmat\n')
+outputfile4.write('./Fmat < input_space > log_fmat\n')
 outputfile4.write('echo "TDA calculation"\n')
 outputfile4.write('cd ../tda\n')
-outputfile4.write('./tda > log_TDA\n')
+outputfile4.write('./Tda > log_TDA\n')
 outputfile4.write('cd ..\n')
 outputfile4.write('\n')                                                         
 outputfile4.write('echo "1-phonon densities calculation"\n')
@@ -376,23 +376,25 @@ outputfile4.close()
 outputfile5= open("run_admat2.sh", "w")
 outputfile5.write('echo "Calculation of 2-phonon AD matrices"\n')
 outputfile5.write('#cat $PBS_NODEFILE > nodes.txt\n')
-outputfile5.write('#/opt/intel/compilers_and_libraries_2020/linux/mpi/intel64/bin/mpirun -np $NUM_MPI_PROCS ./eqm_admat > log_ad 2>error_ad\n')
-outputfile5.write('#/software/openmpi-1.8.2/intel/bin/mpirun -np $NUM_MPI_PROCS ./eqm_admat > log_ad 2>error_ad\n')
-outputfile5.write('#source ../mpi_openmp_set.sh\n')
+#outputfile5.write('#/opt/intel/compilers_and_libraries_2020/linux/mpi/intel64/bin/mpirun -np $NUM_MPI_PROCS ./eqm_admat > log_ad 2>error_ad\n')
+#outputfile5.write('#/software/openmpi-1.8.2/intel/bin/mpirun -np $NUM_MPI_PROCS ./eqm_admat > log_ad 2>error_ad\n')
+#outputfile5.write('#source ../mpi_openmp_set.sh\n')
 outputfile5.write('$MPIRUN_PATH/mpirun -np $NUM_MPI_PROCS ./eqm_admat > log_ad 2>error_ad\n')
 outputfile5.close()
 
 outputfile6= open("run_admat3.sh", "w")
 outputfile6.write('echo "Calculation of AD matrices"\n')
 outputfile6.write('#cat $PBS_NODEFILE > nodes.txt\n')
-outputfile6.write('/opt/intel/compilers_and_libraries_2020/linux/mpi/intel64/bin/mpirun -np $NUM_MPI_PROCS ./eqm3_admat > log_ad 2>error\n')
-outputfile6.write('#/software/openmpi-1.8.2/intel/bin/mpirun -np $NUM_MPI_PROCS ./eqm3_admat > log_ad 2>error_ad\n')
+#outputfile6.write('/opt/intel/compilers_and_libraries_2020/linux/mpi/intel64/bin/mpirun -np $NUM_MPI_PROCS ./eqm3_admat > log_ad 2>error\n')
+#outputfile6.write('#/software/openmpi-1.8.2/intel/bin/mpirun -np $NUM_MPI_PROCS ./eqm3_admat > log_ad 2>error_ad\n')
+outputfile6.write('$MPIRUN_PATH/mpirun -np $NUM_MPI_PROCS ./eqm3_admat > log_ad 2>error_ad\n')
 outputfile6.close()
 
 outputfile7= open("run_dens1.sh", "w")
 outputfile7.write('#cat $PBS_NODEFILE > nodes.txt\n')
-outputfile7.write('#/software/openmpi-1.8.2/intel/bin/mpirun -np $NUM_MPI_PROCS ./phon_dens1_MPI > log_dens1 2>error\n')
-outputfile7.write('cd phon_dens1/\n')
+#outputfile7.write('#/software/openmpi-1.8.2/intel/bin/mpirun -np $NUM_MPI_PROCS ./phon_dens1_MPI > log_dens1 2>error\n')
+#outputfile7.write('cd phon_dens1/\n')
+outputfile7.write('cd eqm2_MPI/\n')
 outputfile7.write('source ../mpi_openmp_set.sh\n')
 outputfile7.write('$MPIRUN_PATH/mpirun -np $NUM_MPI_PROCS ./phon_dens1_MPI > log_dens1 2>error\n')
 outputfile7.close()
@@ -400,15 +402,16 @@ outputfile7.close()
 outputfile8= open("run_dens2.sh", "w")
 outputfile8.write('echo "Calculation of 2-phonon densities"\n')
 outputfile8.write('#cat $PBS_NODEFILE > nodes.txt\n')
-outputfile8.write('/opt/intel/compilers_and_libraries_2020/linux/mpi/intel64/bin/mpirun -np $NUM_MPI_PROCS ./phon_dens2_MPI > log_dens2 2>error_dens2\n')
-outputfile8.write('#/software/openmpi/3.1.2/intel/bin/mpirun -np $NUM_MPI_PROCS phon_dens2_MPI > log_dens2 2>error_dens2     \n')
+#outputfile8.write('/opt/intel/compilers_and_libraries_2020/linux/mpi/intel64/bin/mpirun -np $NUM_MPI_PROCS ./phon_dens2_MPI > log_dens2 2>error_dens2\n')
+#outputfile8.write('#/software/openmpi/3.1.2/intel/bin/mpirun -np $NUM_MPI_PROCS phon_dens2_MPI > log_dens2 2>error_dens2     \n')
+outputfile8.write('$MPIRUN_PATH/mpirun -np $NUM_MPI_PROCS phon_dens2_MPI > log_dens2 2>error_dens2     \n')
 outputfile8.close()
 
 outputfile9= open("run_eqm2.sh", "w")
-outputfile9.write('#export OMP_NUM_THREADS=24\n')
-outputfile9.write('#echo "# of MPI procs"\n')
-outputfile9.write('#export NUM_MPI_PROCS=24\n')
-outputfile9.write('#echo $NUM_MPI_PROCS\n')
+#outputfile9.write('#export OMP_NUM_THREADS=24\n')
+#outputfile9.write('#echo "# of MPI procs"\n')
+#outputfile9.write('#export NUM_MPI_PROCS=24\n')
+#outputfile9.write('#echo $NUM_MPI_PROCS\n')
 outputfile9.write('cd eqm2_MPI/\n')
 outputfile9.write('source ../mpi_openmp_set.sh\n')
 outputfile9.write('echo "Energy threshold"\n')
@@ -418,10 +421,10 @@ outputfile9.close()
 
 
 outputfile10= open("run_eqm3.sh", "w")
-outputfile10.write('#export OMP_NUM_THREADS=24\n')
-outputfile10.write('#echo "# of MPI procs"\n')
-outputfile10.write('#export NUM_MPI_PROCS=24\n')
-outputfile10.write('#echo $NUM_MPI_PROCS\n')
+#outputfile10.write('#export OMP_NUM_THREADS=24\n')
+#outputfile10.write('#echo "# of MPI procs"\n')
+#outputfile10.write('#export NUM_MPI_PROCS=24\n')
+#outputfile10.write('#echo $NUM_MPI_PROCS\n')
 outputfile10.write('cd eqm3_MPI/\n')
 outputfile10.write('source ../mpi_openmp_set.sh\n')
 outputfile10.write('echo "Energy threshold"\n')
@@ -432,7 +435,7 @@ outputfile10.close()
 outputfile11= open("run_phon_int.sh","w")
 outputfile11.write('#  ******** IMPORTANT **************************************************************************  \n')
 outputfile11.write('#  MPI version crashes for specific number of MPI porcesses, try to use smaller number if possible \n')
-outputfile11.write('cd phon_int/\n')
+outputfile11.write('cd eqm2_MPI/\n')
 outputfile11.write('source ../mpi_openmp_set.sh\n')
 outputfile11.write('#$MPIRUN_PATH/mpirun -np $NUM_MPI_PROCS ./phon_int_MPI > log_phon_int 2>error    \n')
 outputfile11.write('$MPIRUN_PATH/mpirun -np 4 ./phon_int_MPI > log_phon_int 2>error\n')
@@ -447,19 +450,19 @@ os.system('mkdir eqm3_MPI')
 os.system('mkdir fmat')
 os.system('mkdir fullham')
 os.system('mkdir nondiag')
-os.system('mkdir phon_dens1')
-os.system('mkdir phon_int')
+#os.system('mkdir phon_dens1')
+#os.system('mkdir phon_int')
 os.system('mkdir scratch')
 os.system('mkdir tda')
-os.system('mkdir input')
+os.system('mkdir hf')
 
 
 os.system('ln -s inputs/mpi_openmp_set.sh')
 ###############
 ###input#####
 ###############
-os.system('cp inputs/input.dat input/')
-os.system('ln -s ../vlk.dat input/')
+os.system('cp inputs/input.dat hf/')
+os.system('ln -s ../vlk.dat hf/')
 
 
 ###############
@@ -473,8 +476,8 @@ os.system('ln -s ../fmat/fmat_p.dat tda/')
 os.system('ln -s ../fmat/fmat_pn.dat tda/')
 os.system('ln -s ../fmat/fmat_np.dat tda/')
 os.system('ln -s ../fmat/singpart_coup.dat tda/')
-os.system('ln -s ../input/r1Y1_n.dat tda/')
-os.system('ln -s ../input/r1Y1_p.dat tda/')
+os.system('ln -s ../hf/r1Y1_n.dat tda/')
+os.system('ln -s ../hf/r1Y1_p.dat tda/')
 
 
 outputfile2= open("fmat/Input_files", "w")
@@ -492,9 +495,9 @@ outputfile2.write('        fmat_np.dat\n')
 
 outputfile2.close()
 os.system('cp inputs/input_space fmat/')
-os.system('ln -s ../input/HF_n.dat fmat/')
-os.system('ln -s ../input/HF_p.dat fmat/')
-os.system('ln -s ../input/vlk_hfb.dat fmat/')
+os.system('ln -s ../hf/HF_n.dat fmat/')
+os.system('ln -s ../hf/HF_p.dat fmat/')
+os.system('ln -s ../hf/vlk_hfb.dat fmat/')
 
 
 ###############
@@ -522,22 +525,22 @@ outputfile1.close()
 ###############
 ######phon_dens1#####
 ###############
-os.system('ln -s ../inputs/input_tda_coup.dat phon_dens1/')
-os.system('ln -s ../fmat/sigpart_coup.dat phon_dens1/')
-os.system('ln -s ../scratch phon_dens1/')
-os.system('ln -s ../tda/1phonon phon_dens1/')
+#os.system('ln -s ../inputs/input_tda_coup.dat phon_dens1/')
+#os.system('ln -s ../fmat/signpart_coup.dat phon_dens1/')
+#os.system('ln -s ../scratch phon_dens1/')
+#os.system('ln -s ../tda/1phonon phon_dens1/')
 
 ###############
 ######phon_int#####
 ###############
-os.system('ln -s ../fmat/fmat_n.dat phon_int/')
-os.system('ln -s ../fmat/fmat_p.dat phon_int/')
-os.system('ln -s ../fmat/fmat_pn.dat phon_int/')
-os.system('ln -s ../fmat/fmat_np.dat phon_int/')
-os.system('ln -s ../fmat/singpart_coup.dat phon_int/')
-os.system('ln -s ../tda/1phonon phon_int/')
-os.system('ln -s ../scratch phon_int/')
-os.system('ln -s ../inputs/input_tda_coup.dat phon_int/')
+#os.system('ln -s ../fmat/fmat_n.dat phon_int/')
+#os.system('ln -s ../fmat/fmat_p.dat phon_int/')
+#os.system('ln -s ../fmat/fmat_pn.dat phon_int/')
+#os.system('ln -s ../fmat/fmat_np.dat phon_int/')
+#os.system('ln -s ../fmat/singpart_coup.dat phon_int/')
+#os.system('ln -s ../tda/1phonon phon_int/')
+#os.system('ln -s ../scratch phon_int/')
+#os.system('ln -s ../inputs/input_tda_coup.dat phon_int/')
 
 
 ###############
@@ -594,28 +597,28 @@ outputfile1.close()
 os.system('ln -s ../tda/1phonon fullham/')
 os.system('ln -s ../eqm2_MPI/2phonon fullham/')
 os.system('ln -s ../eqm3_MPI/3phonon fullham/')
-os.system('ln -s ../nondiag/Vint_phon12 fullham/')
-os.system('ln -s ../nondiag/Vint_phon23 fullham/')
-os.system('ln -s ../nondiag/Vint_phon13 fullham/')
+os.system('ln -s ../nondiag/Vint_phon12.dat fullham/')
+os.system('ln -s ../nondiag/Vint_phon23.dat fullham/')
+os.system('ln -s ../nondiag/Vint_phon13.dat fullham/')
 
 
 
 
 #############################################
-######Copy of executable files from bin directory##
+###### Move executable files from run directory##
 #############################################
-btda='cp '+bindir+'/tda tda/' 
-bfmat='cp '+bindir+'/fmat fmat/'
-binput='cp '+bindir+'/HFB_DD input/'
-bdens1='cp '+bindir+'/phon_dens1_MPI phon_dens1/'
-bint='cp '+bindir+'/phon_int_MPI phon_int/'
-beq2a='cp '+bindir+'/eqm_admat eqm2_MPI/'
-beq2s='cp '+bindir+'/eqm_svd eqm2_MPI/'
-beq3a='cp '+bindir+'/eqm3_admat eqm3_MPI/'
-beq3s='cp '+bindir+'/eqm3_svd eqm3_MPI/'
-beq3p='cp '+bindir+'/phon_dens2_MPI eqm3_MPI/'
-bnond='cp '+bindir+'/nondiag nondiag/'
-bfullham='cp '+bindir+'/fullham fullham/'
+btda='mv '+bindir+'/Tda tda/' 
+bfmat='mv '+bindir+'/Fmat fmat/'
+binput='mv '+bindir+'/Hf hf/'
+bdens1='mv '+bindir+'/phon_dens1_MPI eqm2_MPI/'
+bint='mv '+bindir+'/phon_int_MPI eqm2_MPI/'
+beq2a='mv '+bindir+'/eqm_admat eqm2_MPI/'
+beq2s='mv '+bindir+'/eqm_svd eqm2_MPI/'
+beq3a='mv '+bindir+'/eqm3_admat eqm3_MPI/'
+beq3s='mv '+bindir+'/eqm3_svd eqm3_MPI/'
+beq3p='mv '+bindir+'/phon_dens2_MPI eqm3_MPI/'
+bnond='mv '+bindir+'/Nondiag nondiag/'
+bfullham='mv '+bindir+'/Fullham fullham/'
 #print btda
 os.system(btda)
 os.system(bfmat)

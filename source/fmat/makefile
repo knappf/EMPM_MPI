@@ -3,7 +3,7 @@
 # options
 #OPT= -L$MKLPATH -I$MKLINCLUDE -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 # exe file
-EXF= fmat
+EXF= Fmat
 EXE_PATH=../${EMPM_RUN_DIR}
 #
 all: anglib.o fmat_unfi.o 
