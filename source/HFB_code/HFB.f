@@ -51,19 +51,15 @@
 !        if(if_QTDA.eq.1) call phonon_density_calc
 
 
-        if(if_NAT.eq.1) call NatOrb
-
+        if(if_NAT.eq.1) then 
+          call NatOrb
 !        if(if_NAT.eq.2) call NatOrb2
-
-        call NatOrb_transf
-
-        ihf=2
-
-        call HFB_energy_NAT
-
-        call radial_wf(2)
- 
-        call TDA_NO    
+          call NatOrb_transf
+           ihf=2
+           call HFB_energy_NAT
+           call radial_wf(2)
+           call TDA_NO
+        endif    
 
 !        call transit_E0_01
 !        call transit_E1_01

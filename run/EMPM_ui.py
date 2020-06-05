@@ -500,8 +500,8 @@ outputfile2.write('        fmat_np.dat\n')
 outputfile2.close()
 #os.system('cp inputs/input_space fmat/')
 os.system('ln -s ../inputs/input_space fmat/')
-os.system('ln -s ../hf/HF_n.dat fmat/')
-os.system('ln -s ../hf/HF_p.dat fmat/')
+os.system('ln -s ../hf/HF_n.out fmat/')
+os.system('ln -s ../hf/HF_p.out fmat/')
 os.system('ln -s ../hf/vlk_hfb.dat fmat/')
 
 
