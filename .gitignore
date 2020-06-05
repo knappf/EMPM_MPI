@@ -12,3 +12,12 @@ run/tda
 run/scratch
 run_test/
 .vscode/launch.json
+run/eqm_admat
+run/eqm_svd
+run/eqm3_admat
+run/eqm3_svd
+run/HFB_DD
+run/phon_dens1_MPI
+run/phon_dens2_MPI
+run/phon_int_MPI
+run/TDA

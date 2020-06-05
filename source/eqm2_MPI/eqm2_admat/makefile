@@ -5,7 +5,7 @@
 #OPT= -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 # exe file
 EXF= eqm_admat
-EXE_PATH=../../../run/eqm2_MPI/
+EXE_PATH=../../${EMPM_RUN_DIR}
 #
 all: types_eqm.o input_sp.o anglib.o base.o admat_cp_par.o eqm.o
 	$(XLFMPI) types_eqm.o input_sp.o anglib.o base.o admat_cp_par.o eqm.o -o ${EXE_PATH}${EXF}

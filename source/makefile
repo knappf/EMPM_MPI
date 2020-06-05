@@ -3,8 +3,8 @@ all:
 #	@$(MAKE) -C HFB_code  
 	@$(MAKE) -C fmat
 	@$(MAKE) -C tda
-	@$(MAKE) -C phon_dens1
-	@$(MAKE) -C phon_int
+	@$(MAKE) -C eqm2_MPI/phon_dens1
+	@$(MAKE) -C eqm2_MPI/phon_int
 	@$(MAKE) -C eqm2_MPI/eqm2_svd
 	@$(MAKE) -C eqm2_MPI/eqm2_admat
 	@$(MAKE) -C eqm3_MPI/eqm3_svd
@@ -26,12 +26,12 @@ tda:
 	@$(MAKE) -C tda
 
 phon_dens1:
-	@$(MAKE) clean -C phon_dens1
-	@$(MAKE) -C phon_dens1
+	@$(MAKE) clean -C eqm2_MPI/phon_dens1
+	@$(MAKE) -C eqm2_MPI/phon_dens1
 
 phon_int:
-	@$(MAKE) clean -C phon_int
-	@$(MAKE) -C phon_int
+	@$(MAKE) clean -C eqm2_MPI/phon_int
+	@$(MAKE) -C eqm2_MPI/phon_int
 
 eqm2_svd:
 	@$(MAKE) clean -C eqm2_MPI/eqm2_svd
@@ -57,8 +57,8 @@ clean:
 #	@$(MAKE) clean -C HFB_code
 	@$(MAKE) clean -C fmat
 	@$(MAKE) clean -C tda
-	@$(MAKE) clean -C phon_dens1
-	@$(MAKE) clean -C phon_int
+	@$(MAKE) clean -C eqm2_MPI/phon_dens1
+	@$(MAKE) clean -C eqm2_MPI/phon_int
 	@$(MAKE) clean -C eqm2_MPI/eqm2_svd
 	@$(MAKE) clean -C eqm2_MPI/eqm2_admat
 	@$(MAKE) clean -C eqm3_MPI/eqm3_svd
