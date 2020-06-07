@@ -1,7 +1,6 @@
 #!/usr/bin/env python2
 # 
-# (kshell_home_dir)/bin/kshell_ui.py 
-#    user interface to generate shell script.
+#  user interface to generate scripts, input files and directories for EMPM.
 # 
 
 import sys, os, os.path, shutil
