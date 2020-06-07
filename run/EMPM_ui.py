@@ -268,6 +268,7 @@ TDA_inputs={
 "maxp_n":10,
 "minp_p":4,
 "minp_n":4,
+"cm":'y'
 }
 
 
@@ -310,7 +311,7 @@ while True:
     else: 
         print "ILLEGAL INPUT"
 
-cm=raw_input("Apply Gramm-Scmidt CM orthogonalzation?: y/n ") 
+#cm=raw_input("Apply Gramm-Scmidt CM orthogonalzation?: y/n ") 
 
 #line1='     '+str(HF_inputs["A"]) + '     ' + str(HF_inputs["Z"] )+ '     ! A,Z\n'
 line1=str(HF_inputs["A"]),str(HF_inputs["Z"] )
@@ -318,14 +319,15 @@ line2=str(TDA_inputs["minh_n"]),str(TDA_inputs["maxh_n"] )
 line3=str(TDA_inputs["minh_p"]),str(TDA_inputs["maxh_p"] )
 line4=str(TDA_inputs["minp_n"]),str(TDA_inputs["maxp_n"] )
 line5=str(TDA_inputs["minp_p"]),str(TDA_inputs["maxp_p"] )
-line6=cm+'                    !Apply Gramm-Scmidt CM orthogonalzation? '
+#line6=cm+'                 !Apply Gramm-Scmidt CM orthogonalzation? '
+line6=str(TDA_inputs["cm"])
 
 outputfileTDA.write((2*'%6.6s') % line1+'     ! A,Z\n')
 outputfileTDA.write((2*'%6.6s') % line2+'     !hole space for neutrons\n')
 outputfileTDA.write((2*'%6.6s') % line3+'     !hole space for protns\n')
 outputfileTDA.write((2*'%6.6s') % line4+'     !particle space for neutrons\n')
 outputfileTDA.write((2*'%6.6s') % line4+'     !particle space for protons\n')
-outputfileTDA.write(line6)
+outputfileTDA.write(line6+'                !apply Gramm-Scmidt CM orthogonalzation?  y/n')
 
 outputfileTDA.close()
 
