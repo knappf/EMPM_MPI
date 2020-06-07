@@ -612,7 +612,7 @@ os.system('ln -s ../eqm2_MPI/2phonon fullham/')
 os.system('ln -s ../eqm3_MPI/3phonon fullham/')
 os.system('ln -s ../nondiag/Vint_phon12.dat fullham/')
 os.system('ln -s ../nondiag/Vint_phon23.dat fullham/')
-os.system('ln -s ../nondiag/Vint_phon13.dat fullham/')
+os.system('ln -s ../nondiag/Vint_phon2.dat fullham/')
 
 # symbolic links to executables 
 
