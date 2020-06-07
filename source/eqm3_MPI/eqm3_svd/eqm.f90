@@ -121,7 +121,7 @@
        write(23,*)ipar,jcal    
        close(23)
 
-       CALL execute_command_line('./run_admat.sh' )
+       CALL execute_command_line('./run_admat3.sh' )
 
 
 !  Choleski anal. of spurious subspace
