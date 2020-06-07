@@ -566,6 +566,7 @@ os.system('ln -s ../fmat/fmat_n.dat eqm2_MPI/')
 os.system('ln -s ../fmat/fmat_p.dat eqm2_MPI/')
 os.system('ln -s ../fmat/fmat_pn.dat eqm2_MPI/')
 os.system('ln -s ../fmat/fmat_np.dat eqm2_MPI/')
+os.system('ln -s ../run_admat2.sh eqm2_MPI/')
 os.system('mkdir eqm2_MPI/2phonon')
 
 ###############

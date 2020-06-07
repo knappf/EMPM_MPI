@@ -1,6 +1,5 @@
 *.mod
 *.o
-bin/
 run/eqm2_MPI
 run/eqm3_MPI
 run/fmat
@@ -30,3 +29,4 @@ run/run_eqm2.sh
 run/run_eqm3.sh
 run/run_phon_int.sh
 run/run.sh
+bin/
