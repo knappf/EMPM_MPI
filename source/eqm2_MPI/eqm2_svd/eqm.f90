@@ -117,7 +117,7 @@
        open(23,file='AD_J_Pi.dat',status='unknown',form='formatted')     
        write(23,*)ipar,jcal    
        close(23)
-       CALL execute_command_line('./run_admat.sh' )
+       CALL execute_command_line('./run_admat2.sh' )
  
 !       stop
 
