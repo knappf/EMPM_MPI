@@ -10,7 +10,7 @@ run/tda
 run/scratch
 run/inputs
 run_test/
-.vscode
+.vscode/
 run/eqm_admat
 run/eqm_svd
 run/eqm3_admat
