@@ -580,8 +580,9 @@ subroutine ham_geev(ndim,ndimr,no,nor,ns,irow,wr,xr,vr,ipar,jcal,mxtr,phonbs,nx,
 !       read(6)(d1(iii,jjj),jjj=1,ndimt)
 !      enddo
 
-  call read_admatr('./scratch/d_mat_',d1,ndimr,ndim)
-!  call read_admatr_OMP('./scratch/d_mat_',d1,ndimr,ndim)
+!  call read_admatr('./scratch/d_mat_',d1,ndimr,ndim)
+  write(*,*)' Reading D'
+  call read_admatr_OMP('./scratch/d_mat_',d1,ndimr,ndim)
 
   iout=0
   if (iout.eq.1) then 
@@ -618,8 +619,9 @@ subroutine ham_geev(ndim,ndimr,no,nor,ns,irow,wr,xr,vr,ipar,jcal,mxtr,phonbs,nx,
 
 !      close(6)
 
-  call read_admatr('./scratch/a_mat_',amatr,ndimr,ndim)
-!  call read_admatr_OMP('./scratch/a_mat_',amatr,ndimr,ndim)
+!  call read_admatr('./scratch/a_mat_',amatr,ndimr,ndim)
+  write(*,*)' Reading A' 
+  call read_admatr_OMP('./scratch/a_mat_',amatr,ndimr,ndim)
 
   write(*,*)ndim,ndimr
 
@@ -650,6 +652,7 @@ subroutine ham_geev(ndim,ndimr,no,nor,ns,irow,wr,xr,vr,ipar,jcal,mxtr,phonbs,nx,
 !c        enddo 
 !c      enddo
   
+  write(*,*)' AD product'
   call dgemm('N','T',ndimr,ndimr,ndim,1.d0,amatr,ndimr,d1,ndimr,0.d0,hami,ndimr)
 
   iout=0

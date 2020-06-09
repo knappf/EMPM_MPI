@@ -149,6 +149,7 @@ module read_admat
       
 !            allocate(dmm(ndim_tot))
 !            dmm=0.0d0
+!            CALL OMP_SET_NUM_THREADS(24)
 
 !$OMP PARALLEL DEFAULT(SHARED) PRIVATE(i,j,row_num,ifile)
 !$OMP DO 
