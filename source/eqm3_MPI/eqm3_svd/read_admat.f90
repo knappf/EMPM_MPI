@@ -1,6 +1,7 @@
 module read_admat
 
     use types_eqm
+!    use omp_lib
     contains
 
     subroutine read_sub_dmat_str(dmatr,ndim,ndimt)
@@ -109,11 +110,13 @@ module read_admat
         end subroutine read_dmat
 
         subroutine read_admatr(path,matr,ndim_tr,ndim_tot)
+            
 
             double precision, dimension(:,:), allocatable :: matr
             double precision, dimension(:), allocatable :: dmm
             character (len=15) :: row_num
             character (len=16) :: path   
+            integer :: i,j,ndim_tr,ndim_tot
     
             if (.not.allocated(matr))  allocate(matr(ndim_tr,ndim_tot))
             matr=0.d0
@@ -139,35 +142,31 @@ module read_admat
 
         subroutine read_admatr_OMP(path,matr,ndim_tr,ndim_tot)
 
+            use omp_lib
             double precision, dimension(:,:), allocatable :: matr
-            double precision, dimension(:), allocatable :: dmm
             character (len=15) :: row_num
             character (len=16) :: path   
+            integer :: i,j,i_num,ndim_tr,ndim_tot,i_row 
+            integer :: mythread,nthread
     
             if (.not.allocated(matr))  allocate(matr(ndim_tr,ndim_tot))
             matr=0.d0
       
-!            allocate(dmm(ndim_tot))
-!            dmm=0.0d0
 !            CALL OMP_SET_NUM_THREADS(24)
 
-!$OMP PARALLEL DEFAULT(SHARED) PRIVATE(i,j,row_num,ifile)
-!$OMP DO 
+!$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(mythread,i_num,j,row_num,i_row)
             do i=1,ndim_tr
-!              write(932,*)i,ndim_tr
-              write(row_num,'(i15.15)')i
-              ifile=8000+i
-              open(ifile,file=path//row_num,status='old',form='unformatted')
-!               read(ifile)(dmm(j),j=1,ndim_tot)
-               read(ifile)(matr(i,j),j=1,ndim_tot)
-!               matr(i,1:ndim_tot)=dmm(1:ndim_tot)
-              close(ifile) 
-            enddo
-!$OMP END DO
-!$OMP END PARALLEL      
-      
-!            deallocate(dmm)
-    
+              mythread=omp_get_thread_num()                  
+               i_num=1000+mythread         
+               i_row=i
+               write(row_num,'(i15.15)')i_row
+!               write(888,*)'Thread ',mythread,'opens file number',i_num,row_num 
+               open(i_num,file=path//row_num,form='unformatted')
+                read(i_num)(matr(i_row,j),j=1,ndim_tot)
+               close(i_num) 
+            enddo            
+!$OMP END PARALLEL DO           
+
             return
 
         end subroutine read_admatr_OMP

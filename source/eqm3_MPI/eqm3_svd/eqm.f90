@@ -12,6 +12,7 @@
       use cm_ort_svd
       use dens_list
 
+
       implicit double precision (a-h,o-z)
 
 !      include 'types_eqm.inc'
@@ -108,7 +109,6 @@
 
  
       call phonbase(nf,ipar,jcal,phonus,phonmus,idim1,idim2,idimbs,idphon,idphontr,phonbs,phon1,phon2,mxtr,n_spur)
-!     stop
       write(*,*)' Dimension = ',idphon
       write(*,*)' Truncated dimension = ',idphontr
       idphontot=idphon
@@ -116,13 +116,11 @@
       if (idphon.gt.0) then 
 
 ! calculation of matrices A and D
-!       call admat(nf,ipar,jcal,phonbs,idphon,no,phon1,phon2,mxt,xcc,ndcc,ipozx,ndbx)
        open(23,file='AD_J_Pi.dat',status='unknown',form='formatted')     
        write(23,*)ipar,jcal    
        close(23)
 
        CALL execute_command_line('./run_admat3.sh' )
-
 
 !  Choleski anal. of spurious subspace
        call read_sub_dmat_str(dd,n_spur,idphon)

@@ -581,8 +581,11 @@ subroutine ham_geev(ndim,ndimr,no,nor,ns,irow,wr,xr,vr,ipar,jcal,mxtr,phonbs,nx,
 !      enddo
 
 !  call read_admatr('./scratch/d_mat_',d1,ndimr,ndim)
+  time_est = SECNDS(0.0)
   write(*,*)' Reading D'
   call read_admatr_OMP('./scratch/d_mat_',d1,ndimr,ndim)
+  time_run = SECNDS(time_est)
+  print '("Loading time  = ",f15.5," s.")',time_run
 
   iout=0
   if (iout.eq.1) then 
@@ -620,11 +623,13 @@ subroutine ham_geev(ndim,ndimr,no,nor,ns,irow,wr,xr,vr,ipar,jcal,mxtr,phonbs,nx,
 !      close(6)
 
 !  call read_admatr('./scratch/a_mat_',amatr,ndimr,ndim)
+  time_est = SECNDS(0.0)
   write(*,*)' Reading A' 
   call read_admatr_OMP('./scratch/a_mat_',amatr,ndimr,ndim)
+  time_run = SECNDS(time_est)
+  print '("Loading time  = ",f15.5," s.")',time_run
 
-  write(*,*)ndim,ndimr
-
+  write(*,*)'A,D dimensions :', ndim,ndimr
 
   iout=0
   if (iout.eq.1) then 
