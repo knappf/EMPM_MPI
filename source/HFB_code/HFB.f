@@ -48,6 +48,8 @@
 
         call TDA
 
+        call MBPT
+
 !        if(if_QTDA.eq.1) call phonon_density_calc
 
 
@@ -58,12 +60,11 @@
            ihf=2
            call HFB_energy_NAT
            call radial_wf(2)
-           call TDA_NO
+           call TDA_NO  ! TODO  not working properly sometimes crashes   !!!!!
         endif    
 
 !        call transit_E0_01
 !        call transit_E1_01
-
 !        call deallocate_all
 
        stop

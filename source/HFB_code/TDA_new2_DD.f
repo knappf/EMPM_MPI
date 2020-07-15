@@ -49,6 +49,10 @@
        write(4) min_p,max_p,min_n,max_n
        
        ihf=1
+
+!
+
+
        do ipar=-1,1,2
         do Jp=0,3!jmax
 

@@ -319,14 +319,6 @@ endif
         iaaold=iaa
        endif
 
-!       call OMP_SET_NUM_THREADS(6)
-!$omp parallel default(shared) private(jjj,dd,aa, &
-!$omp xsixj,ii,iii,ib,ibb,jlap,jilap,jialp,ibt,i1,i2, &
-!$omp isi,faz,itid,ji1,ji2)
-
-!$omp do schedule (dynamic)
-
-
        do j=1,ndim
 
         jjj=j
@@ -526,10 +518,6 @@ endif
         d_m(j)=dd
 
        enddo  ! over j
-
-!$omp end do
-
-!$omp end parallel
 
        
        write(6)(a_m(jjj),jjj=1,ndim)
