@@ -109,13 +109,13 @@
       namefph='V_phon_h_p.dat'
 
  
-      call read_input_par(ihp_min,ihp_max,ihn_min,ihn_max,ipp_min,ipp_max,ipn_min,ipn_max,isi_max,ndla_max,ndla2_max)
+      call read_input_par(ihp_min,ihp_max,ihn_min,ihn_max,ipp_min,ipp_max,ipn_min,ipn_max,isi_max,ndla_max)
 
 !      write(*,*)ihp_min,ihp_max,ihn_min,ihn_max,ipp_min,ipp_max,ipn_min,ipn_max,isi_max,ndla_max
       ndla=ndla_max
       nsi=2*isi_max
 
-      ndla2=ndla2_max
+      ndla2=ndla_max
 
 !      allocate(h_corr(ndla2))
 
@@ -847,7 +847,7 @@
 
       end subroutine loadsp
 !
-      subroutine  read_input_par(ihp_min,ihp_max,ihn_min,ihn_max,ipp_min,ipp_max,ipn_min,ipn_max,isi_max,ndla_max,ndla2_max)
+      subroutine  read_input_par(ihp_min,ihp_max,ihn_min,ihn_max,ipp_min,ipp_max,ipn_min,ipn_max,isi_max,ndla_max)
 
 
       include 'formats_eqm.inc'
@@ -878,17 +878,6 @@
       enddo
 
       ndla_max=i
-
-      name1f='2phonon/2f_states.dat'
-
-      open (3,file=name1f,status='old',form='unformatted')
-
-      do while (.not.eof(3))
-       read(3)i,ipar,ijj,en
-      enddo
-
-      ndla2_max=i
-
 
       close(3)
 
