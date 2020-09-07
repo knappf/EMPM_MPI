@@ -6,6 +6,7 @@
 
 program phon_int 
 
+use ifposix      
 use input_sp
 use phoninterac
 
@@ -53,6 +54,7 @@ call MPI_COMM_SIZE( MPI_COMM_WORLD, numprocs, ierr )
 
       call inp_sp(levn,levp,myid)
 
+
       jmaxn=0
       do i=1,ippmx
        if (levp(i)%j.gt.jmaxn) jmaxn=levp(i)%j
@@ -64,47 +66,28 @@ call MPI_COMM_SIZE( MPI_COMM_WORLD, numprocs, ierr )
 
       if (myid.eq.0) write(*,*)'jmax =',jmaxn
 
-
       jmax=jmaxn
       
-!c      call checkf
-!c      call checkfmat
-!c      call checkro
-      
-!c      stop
-      
-      
-      ifmx=5000
-
       if (myid.eq.0) write(*,*)'energy threshold for 1 phonon states'
-!     read(*,*)xthrun_min,xthrun_max
       xthrun_min=0.0
       xthrun_max=1000000000.0
       if (myid.eq.0) write(*,*)xthrun_min,xthrun_max
  
-!      write(*,*)'Type of phonon-phonon intetaction: pp,np,ph,nh'
-!      read(*,*)type_phon
-!      write(*,*)type_phon
 
 
-call vintp(1,ifmx,jmax,levn,xthrun_min,xthrun_max,myid,numprocs)  ! neutron particle
+call vintp(1,ifmx,jmax,levn,xthrun_min,xthrun_max,myid,numprocs)  
 
-call MPI_BARRIER(  MPI_COMM_WORLD, ierr)
+call MPI_Barrier(  MPI_COMM_WORLD, i_error)
 
 call vintp(-1,ifmx,jmax,levp,xthrun_min,xthrun_max,myid,numprocs)
 
-call MPI_BARRIER(  MPI_COMM_WORLD, ierr)
+call MPI_Barrier(  MPI_COMM_WORLD, i_error)
 
 call vinth(1,ifmx,jmax,levn,xthrun_min,xthrun_max,myid,numprocs)
 
-call MPI_BARRIER(  MPI_COMM_WORLD, ierr)
+call MPI_Barrier(  MPI_COMM_WORLD, i_error)
 
 call vinth(-1,ifmx,jmax,levp,xthrun_min,xthrun_max,myid,numprocs)
-
-!      if (type_phon.eq.'np') call vintp(1,ifmx,jmax,levn,xthrun_min,xthrun_max)  ! neutron particle 
-!      if (type_phon.eq.'pp') call vintp(-1,ifmx,jmax,levp,xthrun_min,xthrun_max) ! proton particle
-!      if (type_phon.eq.'ph') call vinth(-1,ifmx,jmax,levp,xthrun_min,xthrun_max) ! proton hole
-!      if (type_phon.eq.'nh') call vinth(1,ifmx,jmax,levn,xthrun_min,xthrun_max)  ! neutron hole
 
 
 call MPI_FINALIZE(irc)      

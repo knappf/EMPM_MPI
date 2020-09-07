@@ -1,6 +1,6 @@
 # compiler 
 #XLF= mpif90 -O3 #-parallel 
-#XLFMPI= mpiifort -O3 #-parallel
+#XLFMPI= mpiifort -g #O3 #-parallel
 #XLF=/afs/ics.muni.cz/software/openmpi-1.8.2/intel/bin/mpifort -O3
 # options
 #OPT= -L$MKLPATH -I$MKLINCLUDE -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread

@@ -6,6 +6,8 @@
 
       use eofmod
 
+      
+
       contains
       
       subroutine vinth(ipart,ifmx,isimax,lev,xthrun_min,xthrun_max,myid,numprocs)
@@ -14,6 +16,7 @@
 
       implicit double precision(a-h,o-z)
 
+      include 'mpif.h'
       include 'types_phon_int.inc'
       include 'input_phon_int.inc'
       include 'formats_phon_int.inc'
@@ -44,11 +47,7 @@
       
       ndrho=10000000
       allocate(rh(ndrho))
-
-      allocate(ius(ifmx))
-      ius=0
-
-     
+    
       jmin=0
       jmax=isimax
 
@@ -58,8 +57,9 @@
       allocate (jphon(ifmxx))
       jphon=0
 
-
+      allocate(ius(ifmxx))
       ius=0
+
       open (3,file='1phonon/1f_states.dat',status='old',form='unformatted')
 
       do while (.not.eof(3))
@@ -77,7 +77,7 @@
        if (ius(i).eq.1) icount=icount+1
       enddo
 
-      write(*,*)' Number of 0hom+1hom+2hom+3hom phonons ',icount
+      if (myid ==0) write(*,*)' Number of used phonons ',icount
 
 
       
@@ -145,8 +145,6 @@
       if (ipart.eq.-1) write(*,*)'Calculation of phonon proton hole interaction'
      endif 
 
-
-
       allocate(vint(0:isimax,ihmin:ihmax,ihmin:ihmax))
 
       vint=0.0d0
@@ -162,7 +160,7 @@
       enddo
 
       call rperm(icount, ig_resh)
-
+      
 !      do ig=1,ifmx
 !       do ig=ig_min,ig_max
 
@@ -172,6 +170,8 @@
               n_seg=icount/numprocs+1
       endif
 !      n_rem=mod(icont,numprocs)
+
+      call MPI_Barrier(  MPI_COMM_WORLD, i_error)
 
 if (myid.eq.0) write(*,*) ' size of segment = ',n_seg
 
@@ -416,7 +416,12 @@ if (myid.eq.0) write(*,*) ' size of segment = ',n_seg
 !      write(5)0,0,0,0,0.d0      
       enddo ! loop ig      
 
-      deallocate(rh,camp,camn,jphon,fp,fpn,ronp,ronh,ropp,roph)
+      if (allocated(ronp)) deallocate(ronp)
+      if (allocated(ropp)) deallocate(ropp)
+      if (allocated(ronh)) deallocate(ronh)
+      if (allocated(roph)) deallocate(roph)
+
+      deallocate(rh,camp,camn,jphon,fp,fpn)
 
 !      write(5)10000000
 !      write(5)0,0,0,0,0.d0 
@@ -435,6 +440,8 @@ if (myid.eq.0) write(*,*) ' size of segment = ',n_seg
 
       implicit double precision(a-h,o-z)
 
+
+      include 'mpif.h'
       include 'types_phon_int.inc'
       include 'input_phon_int.inc'
       include 'formats_phon_int.inc'
@@ -464,11 +471,6 @@ if (myid.eq.0) write(*,*) ' size of segment = ',n_seg
 
       ndrho=100000000
       allocate(rh(ndrho))
-
-
-      allocate(ius(ifmx))
-      ius=0
-      
      
       jmin=0
       jmax=isimax
@@ -478,6 +480,8 @@ if (myid.eq.0) write(*,*) ' size of segment = ',n_seg
       ifmxx=10000
       allocate (jphon(ifmxx))
       jphon=0
+
+      allocate(ius(ifmxx))
 
       ius=0
 
@@ -501,7 +505,7 @@ if (myid.eq.0) write(*,*) ' size of segment = ',n_seg
        if (ius(i).eq.1) icount=icount+1
       enddo
 
-      if (myid.eq.0) write(*,*)' Number of 0hom+1hom+2hom+3hom phonons ',icount
+      if (myid.eq.0) write(*,*)' Number of used phonons ',icount
 
 
       if (ipart.eq.1) then 
@@ -579,8 +583,8 @@ if (myid.eq.0) write(*,*) ' size of segment = ',n_seg
        endif
       enddo
 
-      call rperm(icount, ig_resh)
 
+      call rperm(icount, ig_resh)
 
 !      do ig=1,ifmx
 !       do ig=ig_min,ig_max 
@@ -592,8 +596,10 @@ if (myid.eq.0) write(*,*) ' size of segment = ',n_seg
       endif
 !      n_rem=mod(icont,numprocs)
 
-if (myid.eq.0) write(*,*) ' size of segment = ',n_seg
+      call MPI_Barrier(  MPI_COMM_WORLD, i_error)
 
+     if (myid.eq.0) write(*,*) ' size of segment = ',n_seg
+   
        
       do igg=myid*n_seg+1,min((myid+1)*n_seg,icount)
 
@@ -796,45 +802,25 @@ if (myid.eq.0) write(*,*) ' size of segment = ',n_seg
       write(5)(rh(iii)%rho,iii=1,iirg)
       endif
 
-!      do iii=1,iirg
-!       write(331,'(5i5,f15.10)')ig,rh(iii)%ib,rh(iii)%isi,rh(iii)%i1,rh(iii)%i2,rh(iii)%rho
-!      enddo
-!      write(331,*)ig,iirg
-
 
       close(5)
 
       endif
 
-!      if (iirg.eq.0) then
-!      write(5)iirg
-!      write(5)iirg
-!      write(5)iirg
-!      write(5)iirg
-!      write(5)dfloat(iirg)
-!      endif
-
-
-
-!      write(5)0,0,0,0,0.d0 
 
       enddo ! loop ig      
 
-      deallocate(rh,camp,camn,jphon,fp,fpn,ronp,ronh,ropp,roph)
+      if (allocated(ronp)) deallocate(ronp)
+      if (allocated(ropp)) deallocate(ropp)
+      if (allocated(ronh)) deallocate(ronh)
+      if (allocated(roph)) deallocate(roph)
 
-!      write(5)10000000
-!      write(5)0,0,0,0,0.d0 
+      deallocate(rh,camp,camn,jphon,fp,fpn)
 
-!      close(33)
-!      close(34)
-!      close(43)
-!      close(44)
-!      close(5)
+
       return
       end subroutine vintp
-
-
-!************************************************************************
+!**************************************************************************************
       subroutine readcam(fname,ndimi,ndimj,cam,ndcc)
 
       implicit double precision (a-h,o-z)
