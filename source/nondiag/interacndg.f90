@@ -760,11 +760,7 @@ allocate(c_pp(0:jmax2,ndro),c_nh(0:jmax2,ndro),c_np(0:jmax2,ndro),c_ph(0:jmax2,n
                   write(*,*)'Calculation of redefined interaction'
 
                   ndro=10000000
-            
-                  allocate (ronp(ndro))
-                  allocate (ropp(ndro))
-                  allocate (ronh(ndro))
-                  allocate (roph(ndro))
+                              
                   allocate (vint(ifmmx))
 
       
