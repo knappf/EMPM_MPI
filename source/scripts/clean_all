@@ -1,0 +1,11 @@
+rm -r eqm2_MPI
+rm -r eqm3_MPI
+rm -r fmat
+rm -r fullham
+#rm -r hf
+#rm -r inputs
+rm -r nondiag
+rm -r scratch
+rm -r tda
+rm *.sh
+
