@@ -67,19 +67,21 @@
 
       if (ndmpho(3).gt.0.and.ndmpho(1).gt.0) then 
        write(*,*)'Calculating nondiagonal part 13'
-       call nondiag2(3,nbs,ndmpho,phonbs,iparc,jcalc)
+!       call nondiag2(3,nbs,ndmpho,phonbs,iparc,jcalc)   ! old routine 
+       call nondiag13(3,nbs,ndmpho,phonbs,iparc,jcalc)   ! new routine
       endif
 !      stop
 
       if (ndmpho(3).gt.0.and.ndmpho(2).gt.0) then
        write(*,*)'Calculating nondiagonal part 23'
-       call nondiag1r(3,nbs,ndmpho,phonbs,iparc,jcalc)
+!       call nondiag1r_v2(3,nbs,ndmpho,phonbs,iparc,jcalc)  ! old routine
+       call nondiag23(3,nbs,ndmpho,phonbs,iparc,jcalc)      ! new routine
        endif
 
         
       if (ndmpho(2).gt.0.and.ndmpho(1).gt.0) then 
        write(*,*)'Calculating nondiagonal part 12'
-       call nondiag1r(2,nbs,ndmpho,phonbs,iparc,jcalc)
+       call nondiag1r_v2(2,nbs,ndmpho,phonbs,iparc,jcalc)
       endif
       
      

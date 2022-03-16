@@ -147,7 +147,7 @@
       ipozinv=0
 
     
-      allocate(vred(nfong,nfons,nfona))
+      allocate(vred(nfong,nfons,0:nfona))
 
       write(*,*)'Array vred allocated!'
 
@@ -253,6 +253,231 @@
       return
       end subroutine nondiag1r
 !************************************************************************
+      subroutine nondiag1r_v2(nff,nbs,ndmpho,phonbs,ipcal,jcal)
+
+      implicit double precision (a-h,o-z)
+
+      include 'types_fullham.inc'
+
+      type (phon_typ), dimension (:,:), allocatable :: phonbs
+ 
+      real(kind=4), dimension(:,:,:), allocatable :: vred
+      real(kind=4) :: vr
+
+      double precision, dimension (:), allocatable :: vint,vintm
+
+      integer, dimension(:,:), allocatable :: nbs
+      integer, dimension(:), allocatable :: ipoza,ipozinv
+      type(ampr_typ),dimension(:,:),allocatable :: xcc
+      integer, dimension (:), allocatable :: ndcc,ndmpho
+
+      character*30 fname,fnamev,fnamevm,fnameo
+
+
+
+      if (nff.eq.2) then 
+              fnamev='Vint_phon12.dat'
+              fnamevm='Vint_phon01.dat'
+              fnameo='nondiag12.dat'
+      endif
+
+      if (nff.eq.3) then 
+              fnamev='Vint_phon23.dat'
+              fnamevm='Vint_phon01.dat'
+              fnameo='nondiag23.dat'
+      endif
+
+      call dimensions_phonsp(nff,nfong,nfons)
+
+      nfona=nfong/4  ! nff-1 phonon dimension   ! redukovana dimenzia nemusi obsahovat vsetky 1 fononove stavy
+!      nfong=50000  ! nff-1 phonon dimension
+!      nfons=200   ! 1 phonon dimension sigma index
+
+
+      open(12,file=fnameo,status='unknown',form='unformatted')
+
+      open(3,file=fnamev,status='old',form='unformatted')
+  
+      allocate (ipoza(nfong),ipozinv(nfong))
+      ipoza=0
+      ipozinv=0
+
+    
+      allocate(vred(nfong,nfons,0:nfona))
+
+      write(*,*)'Array vred allocated!'
+
+      vred=0.0 
+      iii=0
+
+!    POZOR na nezrovnalosti s idexami ig ia
+
+      do while (.not.eof(3))
+        read(3)ig,ia,is,vr
+
+
+!c        write(*,*)ia,ig,is,vr
+
+        if (ipoza(ig).eq.0) then
+                iii=iii+1
+                if (iii.gt.nfona) then 
+                  write(*,*)'Increase parameter nfona in nondiag1r'
+                  stop
+                endif
+!c                write(*,*)ipozic,ia
+                ipoza(ig)=iii
+                ipozinv(iii)=ig
+!c                write(*,*)ipozz,ia
+        endif
+
+
+      vred(ia,is,ipoza(ig))=vr
+
+ 11   continue
+      enddo
+
+      close(3)
+
+      write(*,*)' Ipoz_max check :' , iii
+!      stop
+
+
+      if (nff.eq.2) fname='2phonon/2f_x.dat'
+      if (nff.eq.3) fname='3phonon/3f_x.dat'
+              
+      call read_ampl(fname,xcc,ndcc,ipcal,jcal)
+
+      nf2=ndmpho(nff)
+      nf1=ndmpho(nff-1)
+
+        allocate(vint(nf2))
+        vint=0.d0
+
+        do j=1,nf1   ! cycle over (n-1) phonon
+
+         write(*,*)j,nf1
+
+          vint=0.d0
+          jj=nbs(nff-1,j)
+         ndmx=ndcc(nbs(nff,1))
+
+          do kk=1,ndmx
+            isi=xcc(nbs(nff,1),kk)%is
+            igi=xcc(nbs(nff,1),kk)%ig
+            vrr=vred(igi,isi,ipoza(jj))
+
+           do i=1,nf2
+            ii=nbs(nff,i)
+            vint(i)=vint(i)+xcc(ii,kk)%am*vrr
+            enddo
+          enddo
+
+          do i=1,nf2     
+            if (dabs(vint(i)).gt.1.d-10) write(12)i,j,vint(i)
+          enddo
+        enddo
+
+      deallocate(vred,xcc)
+
+      close(2)
+      close(3)
+
+      return
+      end subroutine nondiag1r_v2
+!**************************************************************************
+
+      subroutine nondiag23(nff,nbs,ndmpho,phonbs,ipcal,jcal)
+
+        implicit double precision (a-h,o-z)
+  
+        include 'types_fullham.inc'
+  
+        type (phon_typ), dimension (:,:), allocatable :: phonbs
+   
+        double precision, dimension(:,:,:), allocatable :: vred
+  
+        double precision, dimension (:), allocatable :: vint,vintm
+  
+        integer, dimension(:,:), allocatable :: nbs,ind_v
+        integer, dimension(:), allocatable :: ipoza,ipozinv
+        type(amp_typ),dimension(:),allocatable :: xcc
+        real(kind=4), dimension(:,:), allocatable :: xccr,v23,h23
+        
+        integer, dimension (:), allocatable :: ndmpho
+        real(kind=4) vr
+        character*30 fname,fnamev,fnamevm,fnameo
+  
+        
+        if (nff.eq.3) then 
+            fnamev='Vint_phon23.dat'
+            fnameo='nondiag23.dat'
+        endif
+
+        open(12,file=fnameo,status='unknown',form='unformatted')
+  
+        if (nff.eq.3) fname='3phonon/3f_x.dat'        
+        call read_Xampl3(fname,xcc,xccr,ndmx,ipcal,jcal)  ! read 3 phohon amplitudes 
+ 
+        call dimensions_phonsp(nff,nfong,nfons)
+
+        allocate(ind_v(nfons,nfong))
+        ind_v=0
+
+        do i=1,ndmx
+          ind_v(xcc(i)%is,xcc(i)%ig)=i
+        enddo
+
+        allocate (ipoza(nfong),ipozinv(nfong))
+        ipoza=0
+        ipozinv=0
+
+        j=0
+
+        nf3=ndmpho(nff)
+        nf2=ndmpho(nff-1)
+
+        allocate(v23(ndmx,nf2))
+        v23=0.0
+
+        open(3,file=fnamev,status='old',form='unformatted')
+
+        do while (.not.eof(3))
+
+          read(3)ia,ig,is,vr   ! ia - reduced 2 phonon, ig all
+          if (ipoza(ia).eq.0) then
+            j=j+1
+            ipoza(ia)=j
+            ipozinv(j)=ia
+          endif 
+!          ii=xcc(i)%is
+!          jj=xcc(i)%ig 
+          i=ind_v(is,ig)
+          v23(i,j)=vr
+        enddo
+
+        write(*,*)'Number of different alpha values',j,' should be equal to ', nf2
+ 
+        close(3)
+
+        allocate(h23(nf3,nf2))
+        h23=0.0
+        
+        call sgemm('N','N',nf3,nf2,ndmx,1.0,xccr,nf3,v23,ndmx,0.0,h23,nf3)
+
+        do i=1,nf3
+          do j=1,nf2
+            write(12)i,j,dble(h23(i,j))
+          enddo
+        enddo
+
+
+        close(12)
+  
+        return
+        end subroutine nondiag23
+  !**************************************************************************
+
+
 
       subroutine nondiag2(nff,nbs,ndmpho,phonbs,ipcal,jcal)
 
@@ -262,7 +487,8 @@
 
       type (phon_typ), dimension (:,:), allocatable :: phonbs
  
-      double precision, dimension(:,:), allocatable :: vred
+      real(kind=4), dimension(:,:), allocatable :: vred
+      real(kind=4) :: vr
       double precision, dimension(:), allocatable :: vinti
 
       integer, dimension(:,:), allocatable :: nbs
@@ -291,6 +517,7 @@
       if (nff.eq.2) then 
 
       open(12,file='nondiag02.dat',status='unknown',form='unformatted')
+      open(13,file='h20.dat',status='unknown',form='unformatted')
 
       fname='2phonon/2f_x.dat'
 
@@ -327,7 +554,10 @@
             vint=vint+xcc(ii,kk)%am*vred(igi,isi)*dfloat(ifaz)*(dfloat(2*jisi+1)**0.5d0)*xfact 
           enddo
       
-          if (dabs(vint).gt.1.d-10) write(12)i,j,vint
+          if (dabs(vint).gt.1.d-10) then 
+             write(12)i,j,vint
+             write(13)ii,vint
+          endif
 !          if (dabs(vint).gt.1.d-10) write(998,*)i,j,vint
         enddo
 
@@ -337,6 +567,8 @@
 
       close(2)
       close(3)
+      close(13)
+      close(12)
 
       endif
 
@@ -443,13 +675,93 @@
 
       endif
 
-
-
-
-
       return
       end subroutine nondiag2
 !************************************************************************
+
+      subroutine nondiag13(nff,nbs,ndmpho,phonbs,ipcal,jcal)
+
+        implicit double precision (a-h,o-z)
+  
+        include 'types_fullham.inc'
+  
+        type (phon_typ), dimension (:,:), allocatable :: phonbs
+   
+        double precision, dimension(:,:), allocatable :: vred
+        double precision, dimension(:), allocatable :: vinti
+  
+        integer, dimension(:,:), allocatable :: nbs
+        type(amp_typ),dimension(:),allocatable :: xcc
+        double precision, dimension(:,:), allocatable :: h31
+        real(kind=4), dimension(:,:), allocatable :: xccr
+      
+        double precision, dimension(:), allocatable :: h20
+        integer, dimension (:), allocatable :: ndcc,ndaa,ndmpho,iga
+  
+        character*30 fname,fname2,fname3
+       
+!        call dimensions_phonsp(2,nfon1,nfon1t)
+        nf3=ndmpho(nff)
+        nf2=ndmpho(nff-1)
+        nf1=ndmpho(nff-2)
+
+        call num_phon(1,ndim1f)
+        call num_phon(2,ndim2f)
+        
+        open(12,file='nondiag13.dat',status='unknown',form='unformatted')
+  
+        fname3='3phonon/3f_x.dat'
+
+        allocate(h20(ndim2f))
+        h20=0.d0
+        
+        open(13,file='h20.dat',status='old',form='unformatted')
+
+        do while (.not.eof(13))
+          read(13)i,h20(i)
+        enddo
+        close(13)
+
+        allocate(h31(nf3,nf1))
+        h31=0.d0
+  
+        call read_Xampl3(fname3,xcc,xccr,ndimx,ipcal,jcal)
+
+        allocate(iga(ndim1f))
+        iga=0
+
+        do ia=1,nf1! ndmpho(nff-2)
+          ig=nbs(1,ia)
+          iga(ig)=ia
+        enddo
+
+        do j=1,ndimx   ! sum over sigma and gamma
+            ila=xcc(j)%is
+            ig=xcc(j)%ig
+            if (phonbs(2,ig)%jj.eq.0.and.phonbs(2,ig)%par.eq.1) then 
+            if (phonbs(1,ila)%jj.eq.jcal.and.phonbs(1,ila)%par.eq.ipcal) then
+              ilam=iga(ila)
+             do ib=1,nf3     
+                 h31(ib,ilam)=h31(ib,ilam)+xccr(ib,j)*h20(ig)
+             enddo
+          endif 
+         endif
+        enddo
+      
+        do ib=1,nf3
+         do ia=1,nf1
+             if (dabs(h31(ib,ia)).gt.1.d-10) write(12)ib,ia,h31(ib,ia)/(dfloat(2*jcal+1)**0.5d0)
+        enddo
+        enddo
+ 
+  
+       close(12)
+  
+  
+        return
+        end subroutine nondiag13
+  !************************************************************************
+
 
       subroutine nondiag0(nff,nbs,ndmpho,phonbs,ipcal,jcal)
 
@@ -603,7 +915,7 @@ implicit double precision (a-h,o-z)
 !      include 'formats_phon_int.inc'
   include 'types_fullham.inc'
 
-  type (amp_typ), dimension(:), allocatable :: xcc
+  type (ampr_typ), dimension(:), allocatable :: xcc
   type (ampr_typ), dimension(:,:), allocatable :: xccr
 
   integer, dimension (:), allocatable :: ndcc
@@ -663,6 +975,134 @@ implicit double precision (a-h,o-z)
   return
   end subroutine read_ampl
 !****************************************
+
+  subroutine read_Xampl(fname,xcc,xccr,ndimx,ipcal,jcal)
+
+    implicit double precision (a-h,o-z)
+    
+    !      include 'formats_phon_int.inc'
+      include 'types_fullham.inc'
+    
+      type (amp_typ), dimension(:), allocatable :: xcc
+      real, dimension(:,:), allocatable :: xccr
+    
+    
+      character(len=30)fname
+    
+    !      allocate(xcc(ndimi,ndimj))
+    !      allocate(ndcc(ndimi))
+    
+      open(2,file=fname,status='old',form='unformatted')
+    
+      ilamp=0
+    
+      if (allocated(xcc).eq..TRUE.) deallocate(xcc)
+      if (allocated(xccr).eq..TRUE.) deallocate(xccr)
+    
+    
+      do while (.not.eof(2))
+    
+      read(2)ipar,ijj,no,idphon
+      ndimx=idphon
+    
+      if (ipar.eq.ipcal.and.ijj.eq.jcal) then 
+    
+        allocate(xcc(idphon))
+        allocate(xccr(ilamp:ilamp+no,idphon))
+        
+        read(2)(xcc(i)%ig,xcc(i)%is,i=1,idphon)
+    
+        do ilam=1,no
+            read(2)(xcc(i)%am,i=1,idphon)
+!            xccr(ilam+ilamp,:)%ig=xcc(:)%ig
+!            xccr(ilam+ilamp,:)%is=xcc(:)%is
+            xccr(ilam+ilamp,:)=real(xcc(:)%am)
+        enddo
+    
+        close(2)
+        return
+      else
+      do ilam=1,no+1  
+        read(2)
+      enddo  
+     
+      ilamp=ilamp+no
+    
+      endif 
+    
+      enddo
+    
+      close(2)
+    
+      return
+      end subroutine read_Xampl
+
+!****************************************
+
+      subroutine read_Xampl3(fname,xcc,xccr,ndimx,ipcal,jcal)
+
+        implicit double precision (a-h,o-z)
+        
+        !      include 'formats_phon_int.inc'
+          include 'types_fullham.inc'
+        
+          type (amp_typ), dimension(:), allocatable :: xcc
+          real(kind=4), dimension(:,:), allocatable :: xccr
+        
+        
+          character(len=30)fname
+        
+        !      allocate(xcc(ndimi,ndimj))
+        !      allocate(ndcc(ndimi))
+        
+          open(2,file=fname,status='old',form='unformatted')
+        
+          ilamp=0
+        
+          if (allocated(xcc).eq..TRUE.) deallocate(xcc)
+          if (allocated(xccr).eq..TRUE.) deallocate(xccr)
+        
+        
+          do while (.not.eof(2))
+        
+          read(2)ipar,ijj,no,idphon
+          ndimx=idphon
+        
+          if (ipar.eq.ipcal.and.ijj.eq.jcal) then 
+        
+            allocate(xcc(idphon))
+            allocate(xccr(no,idphon))
+            
+            read(2)(xcc(i)%ig,xcc(i)%is,i=1,idphon)
+        
+            do ilam=1,no
+                read(2)(xccr(ilam,i),i=1,idphon)
+!                xccr(ilam,:)=real(xcc(:)%am)
+!                xccr(ilam,:)=xcc(:)%am
+            enddo
+        
+            close(2)
+            write(*,*)' X amplitudes read!'
+            return
+          else
+          do ilam=1,no+1  
+            read(2)
+          enddo  
+         
+          ilamp=ilamp+no
+        
+          endif 
+        
+          enddo
+        
+          close(2)
+        
+          return
+          end subroutine read_Xampl3
+        !****************************************
+
+  
+
 
       subroutine fulhamt(ndmpho,nbs)
 
@@ -837,14 +1277,24 @@ implicit double precision (a-h,o-z)
 
       deallocate(wr)
 
-      iout=0
+      iout=1
 
       if (iout.eq.1) then 
 
-  302 format(10000f13.4)
+  302 format(100000f10.5)
       do i=1,ndimtot
         write(203,302)(amtr(i,j),j=1,ndimtot)
       enddo
+
+      open(201,file='Hamilt_EMPM.dat',status='unknown',form='unformatted')
+
+      write(201)ndimtot
+      do i=1,ndimtot
+       do j=1,i
+        if (amtr(i,j).ne.0) write(201)i,j,amtr(i,j)
+       enddo
+      enddo
+      close(201)
 
       endif
 
@@ -902,12 +1352,6 @@ implicit double precision (a-h,o-z)
       write(23)((nbs(ipho,i),i=1,ndmpho(ipho)),ipho=0,iphomax)
       write(23)((amtr(i,j),i=1,ndimtot),j=1,ndimtot)
 
-
-      write(201,302)(wr(i),i=1,ndimtot)
-      write(201,*)
-      do i=1,ndimtot
-         write(201,302)(amtr(i,j),j=1,10)
-      enddo
 
 
       close(23)
@@ -1014,6 +1458,27 @@ implicit double precision (a-h,o-z)
       
   
       end subroutine dimensions_phonsp
+
+    subroutine num_phon(nfon,ndim)
+    implicit double precision (a-h,o-z)
+
+    character*30 namef
+
+    if (nfon.eq.1) namef='1phonon/1f_states.dat'
+    if (nfon.eq.2) namef='2phonon/2f_states.dat'
+    if (nfon.eq.3) namef='3phonon/3f_states.dat' 
+
+
+      open(1,file=namef,status='old',form='unformatted')
+
+      do while (.not.eof(1))
+       read(1)i,ipartt,ijj,en
+      enddo
+      ndim=i
+
+      close(1)
+
+    end subroutine num_phon
 
 !******      
 

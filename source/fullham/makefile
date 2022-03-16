@@ -1,5 +1,5 @@
 # compiler 
-#XLF= ifort -O3 -parallel 
+#XLF= ifort -g  # O3 -parallel 
 # option
 OPT= -L$MKLPATH -I$MKLINCLUDE -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 # exe file

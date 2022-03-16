@@ -27,7 +27,7 @@
 
         integer                 :: is
         integer                 :: ig
-        real                    :: am
+        real(kind=4)                    :: am
 
       END TYPE ampr_typ
 
