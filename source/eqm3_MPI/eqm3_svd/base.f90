@@ -160,7 +160,7 @@
       enddo
 
       n_spur=ii  ! number of selected spurious states
-
+      write(*,*)' Dimension of spurious subspace = ',n_spur
 
       ii=0
       do i=1,idphon
@@ -229,6 +229,10 @@
       enddo
 
       idphontr=jj
+!  to calculate all desities fot give J an Pi
+      do ii=1,idim2
+        if (phon2(ii)%j.eq.j.and.phon2(ii)%par.eq.ipare) write(891,*)ii
+      enddo
 
       close(891)
 !      close(892)

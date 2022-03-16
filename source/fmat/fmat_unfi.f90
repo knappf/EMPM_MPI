@@ -233,6 +233,7 @@
 !        read(2,100)it,ip,ij,ia,ib,ic,id,vpl(1)!,vpl(2),vpl(3)
 !     *,vpl(4),vpl(5),vpl(6),vpl(7),vpl(8)
         read(2)it,ij,ia,ib,ic,id,vv
+        
 
 !        vv=vpl(ius)
 
@@ -254,7 +255,7 @@
            idd=int(id/2)+1
 
            if (iaa.le.nlevmaxpc.and.ibb.le.nlevmaxpc.and.icc.le.nlevmaxpc.and.idd.le.nlevmaxpc) then 
-
+!           write(999,'(2i4,5x,4i5,2x,f10.5)')it,ij/2,iaa,ibb,icc,idd,vv
            factab=1.d0
            factcd=1.d0
            if (iaa.eq.ibb) factab=dsqrt(2.d0)
@@ -275,6 +276,7 @@
            endif
           endif
          endif
+
       enddo
 
       jtotmax=jtotmax/2 
@@ -290,7 +292,7 @@
       do isi=jmin,jmax
 
        do ii=nlevmin,nlevmax
-         write(1234,*)isi,jmax,ii,nlevmax
+!         write(1234,*)isi,jmax,ii,nlevmax
           jii=lev(2*ii-1)%j
         do jj=nlevmin,nlevmax
             jjj=lev(2*jj-1)%j
@@ -372,7 +374,7 @@
            idd=int(id/2)
 
            if (iaa.le.nlevmaxnc.and.ibb.le.nlevmaxnc.and.icc.le.nlevmaxnc.and.idd.le.nlevmaxnc) then
-
+!            write(999,'(2i4,5x,4i5,2x,f10.5)')it,ij/2,iaa,ibb,icc,idd,vv
            factab=1.d0
            factcd=1.d0
            if (iaa.eq.ibb) factab=dsqrt(2.d0)
@@ -491,7 +493,7 @@
            idd=int(id/2)
 
            if (iaa.le.nlevmaxpc.and.ibb.le.nlevmaxnc.and.icc.le.nlevmaxpc.and.idd.le.nlevmaxnc) then
-           
+!            write(999,'(2i4,5x,4i5,2x,f10.5)')it,ij/2,iaa,ibb,icc,idd,vv
            vp(ij/2,iaa,ibb,icc,idd)=vv
            vp(ij/2,icc,idd,iaa,ibb)=vv
     
@@ -551,7 +553,7 @@
 
       close(2)
       close(3)
-      close(4)
+!      close(4)
       deallocate(vp)
 
 

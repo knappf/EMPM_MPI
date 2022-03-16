@@ -65,12 +65,21 @@
       jmin=0
       jmax=2
 
+      write(*,*)'ipmin,ipmax?'
+      read(*,*)ipmin,ipmax
+      write(*,*)'jmin,jmax?'
+      read(*,*)jmin,jmax
+      write(*,*)'2-phonon calculation parity interval: ','<',ipmin,',',ipmax,'     >'
+      write(*,*)'J  interval: ','<',jmin,',',jmax,' >'
+
+
+
       write(*,*)' 3-phonon calculation '
 
       do ipar=ipmin,ipmax,2 
-        if (ipar.eq.1) jmax=0
-        if (ipar.eq.-1) jmax=1
-        do jcal=jmax,jmax,1
+!        if (ipar.eq.1) jmax=0
+!        if (ipar.eq.-1) jmax=1
+        do jcal=jmin,jmax,1
             write(*,*)
             write(*,*)'----------------------------------------------'
             write(*,*)' Parity = ',ipar,'   J = ',jcal
@@ -91,15 +100,15 @@
       call execute_command_line('rm 2_phon_dens_calc_myid*')
 
       write(*,*)'2-phon dens. calculated'
-
+!      stop
 
       do ipar=ipmin,ipmax,2 !,-2
 
-       if (ipar.eq.1) jmax=0
-       if (ipar.eq.-1) jmax=1
+!       if (ipar.eq.1) jmax=0
+!       if (ipar.eq.-1) jmax=1
        
         
-      do jcal=jmax,jmax,1
+      do jcal=jmin,jmax,1
      
 
   
@@ -177,8 +186,8 @@
 
       write(*,*)' idphontot =',idphontot      
       do j=1,no
-       write(12)(xr(i,j),i=1,idphontot)
-       write(22)(vr(i,j),i=1,no)
+       write(12)(real(xr(i,j)),i=1,idphontot)
+       write(22)(real(vr(i,j)),i=1,no)
       enddo
 
       nlam=nlam+no
@@ -200,6 +209,8 @@
 
       CALL execute_command_line('rm ./scratch/a_mat*')
       CALL execute_command_line('rm ./scratch/d_mat*')
+
+      
       enddo  ! cycle over J
       enddo  ! cycle over parity
 

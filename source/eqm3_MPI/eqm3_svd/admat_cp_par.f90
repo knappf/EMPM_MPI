@@ -554,19 +554,24 @@
       ndro=15000000
       ndgg=0
 
-      if (.not.allocated(ron)) allocate (ron(ndro))
+      if (allocated(ron)) deallocate (ron)
+
+!       if (.not.allocated(ron)) allocate (ron(ndro))
 
        read(ifile)igg,ndgg
+
+       allocate (ron(ngg))
+
 
        if (igg.ne.ig) then
                write(*,*)' Loaded Ig does not match !!! '
                stop
        endif
 
-       if (ndgg.gt.ndro) then
-                write(*,*)'WARNING: Increase dimension in readro'
-                stop
-       endif
+!       if (ndgg.gt.ndro) then
+!                write(*,*)'WARNING: Increase dimension in readro'
+!                stop
+!       endif
 
        read(ifile)(ron(ii)%ilap,ii=1,ndgg)
        read(ifile)(ron(ii)%j,ii=1,ndgg)

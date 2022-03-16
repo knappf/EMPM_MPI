@@ -495,7 +495,7 @@ character*30 namefp,namefn,namefpn,namecp,namecn,namerpp,namernp,namerph,namernh
 
         endif
 
-        if (dabs(vint).gt.xrotrunc) write(5)ia,ig,isi,xfact*dfloat(ifaz)*vint
+        if (dabs(vint).gt.xrotrunc) write(5)ia,ig,isi,real(xfact*dfloat(ifaz)*vint)
 
 !        if (dabs(vint).gt.xrotrunc) write(991,*)ia,ig,isi,xfact*dfloat(ifaz)*vint
 
@@ -515,8 +515,8 @@ character*30 namefp,namefn,namefpn,namecp,namecn,namerpp,namernp,namerph,namernh
       enddo ! loop ig      
 
       
-      deallocate(camp,camn,jphon,jphonm,fp,fpn,ronp,ronh,ropp,roph)
-      deallocate (ironp,iropp,ironh,iroph)
+!      deallocate(camp,camn,jphon,jphonm,fp,fpn,ronp,ronh,ropp,roph)
+!      deallocate (ironp,iropp,ironh,iroph)
 
 !      write(5)10000000
 !c      write(5)0,0,0,0,0.d0 
@@ -641,7 +641,7 @@ allocate(idimnp(0:jmax2),idimnh(0:jmax2),idimpp(0:jmax2),idimph(0:jmax2))
     idimnh=0
     idimph=0
     idimpp=0
-    ndro=1500000
+    ndro=50000000
 
       open(1,file='input_tda_coup.dat',status='old',form='formatted')
 
@@ -759,8 +759,12 @@ allocate(c_pp(0:jmax2,ndro),c_nh(0:jmax2,ndro),c_np(0:jmax2,ndro),c_ph(0:jmax2,n
                   
                   write(*,*)'Calculation of redefined interaction'
 
-                  ndro=10000000
-                              
+                  ndro=50000000
+            
+                  allocate (ronp(ndro))
+                  allocate (ropp(ndro))
+                  allocate (ronh(ndro))
+                  allocate (roph(ndro))
                   allocate (vint(ifmmx))
 
       
@@ -769,7 +773,7 @@ allocate(c_pp(0:jmax2,ndro),c_nh(0:jmax2,ndro),c_np(0:jmax2,ndro),c_ph(0:jmax2,n
             
             do ia=1,ifmmx
             
-                  write(*,*)ia,ifmmx
+ 
             
                    jia=jphonm(ia)
                    ipa=iphonm(ia)
@@ -779,20 +783,28 @@ allocate(c_pp(0:jmax2,ndro),c_nh(0:jmax2,ndro),c_np(0:jmax2,ndro),c_ph(0:jmax2,n
             
             
                if (jia.eq.jcal.and.ipa.eq.ipcal) then
+                  write(*,*)ia,ifmmx
                   
-                   call readro2(namernp,ia,ronp,nronp)
-if(idimnp(jia).ne.nronp) write(*,*) 'Warning idim ne nro for np',idimnp(jia),nronp
-if(idimnp(jia).ne.nronp) stop
+                   call readro2(namernp,ia,ronp,nronp) 
+if(idimnp(jia).ne.nronp.and.nronp.ne.0) then  
+  write(*,*) 'Warning idim ne nro for np',idimnp(jia),nronp
+  stop
+endif  
                    call readro2(namerpp,ia,ropp,nropp)
-if(idimpp(jia).ne.nropp) write(*,*) 'Warning idim ne nro for np',idimpp(jia),nropp
-if(idimnp(jia).ne.nronp) stop
+if(idimpp(jia).ne.nropp.and.nropp.ne.0) then  
+    write(*,*) 'Warning idim ne nro for np',idimpp(jia),nropp
+    stop
+endif
                    call readro2(namernh,ia,ronh,nronh)
-if(idimnh(jia).ne.nronh) write(*,*) 'Warning idim ne nro for np',idimnh(jia),nronh
-if(idimnh(jia).ne.nronh) stop
+if(idimnh(jia).ne.nronh.and.nronh.ne.0) then  
+   write(*,*) 'Warning idim ne nro for np',idimnh(jia),nronh
+   stop
+endif
                    call readro2(namerph,ia,roph,nroph)
-if(idimph(jia).ne.nroph) write(*,*) 'Warning idim ne nro for np',idimph(jia),nroph
-if(idimph(jia).ne.nroph) stop
-
+if(idimph(jia).ne.nroph.and.nroph.ne.0) then  
+   write(*,*) 'Warning idim ne nro for np',idimph(jia),nroph
+   stop
+endif
 
               do isi=1,ifmx
                   jisi=jphon(isi)
@@ -927,7 +939,7 @@ if(idimph(jia).ne.nroph) stop
                       jig=jphonm(ig)  
                       ifaz=(-1)**(jia+jig+jisi)  
                       if (dabs(vint(ig)).gt.1.d-10) then 
-                        write(5)ia,ig,isi,xfact*dfloat(ifaz)*vint(ig)
+                        write(5)ia,ig,isi,real(xfact*dfloat(ifaz)*vint(ig))
 !                        write(9991,*)ia,ig,isi,xfact*dfloat(ifaz)*vint(ig)
                       endif 
                   enddo
@@ -1107,7 +1119,7 @@ if(idimph(jia).ne.nroph) stop
 
 !        if (dabs(vint).gt.xrotrunc) write(997,*)ia,isi,vint
 
-        if (dabs(vint).gt.xrotrunc) write(5)ia,isi,vint
+        if (dabs(vint).gt.xrotrunc) write(5)ia,isi,real(vint)
 
 
       enddo ! loop isi
@@ -1299,7 +1311,7 @@ if(idimph(jia).ne.nroph) stop
 
       open(ifile,file='scratch/'//fname//'_'//nlam,status='unknown',form='unformatted')
 
-      ndro=5000000
+      ndro=9000000
       ndgg=0
 
       if (.not.allocated(ron)) allocate (ron(ndro))
@@ -1357,7 +1369,7 @@ if(idimph(jia).ne.nroph) stop
       
             open(ifile,file='scratch/'//fname//'_'//nlam,status='unknown',form='unformatted')
       
-            ndro=10000000
+!            ndro=20000000
             ndgg=0
       
             if (.not.allocated(ron)) allocate (ron(ndro))
@@ -1365,7 +1377,7 @@ if(idimph(jia).ne.nroph) stop
              read(ifile)ndgg
 
       
-             if (ndgg.gt.ndro) then
+             if (ndgg.gt.size(ron)) then
                       write(*,*)'WARNING: Increase dimension in readro'
                       stop
              endif

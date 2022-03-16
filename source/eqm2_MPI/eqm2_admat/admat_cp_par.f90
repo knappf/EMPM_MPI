@@ -697,7 +697,7 @@
  
       open(ifile,file='scratch/'//fname//'_'//nlam,status='unknown',form='unformatted')
 
-      ndro=5000000
+      ndro=9000000
       ndgg=0
 
       if (.not.allocated(ronn)) allocate (ronn(ndro))

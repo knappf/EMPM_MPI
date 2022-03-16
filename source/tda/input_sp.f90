@@ -74,8 +74,6 @@
 
       close(1)
 
-
-
    end subroutine inp_sp
 
     subroutine input_kin(kin_p,kin_n)
@@ -101,34 +99,6 @@
 
     return
     end subroutine input_kin
-
-    subroutine check_NZ(ia,iz,i_hole_n_max,i_hole_p_max,levn,levp)
-        implicit none
-
-        include 'types_tda_cp.inc'
-  
-        integer :: i, i_hole_n_max,i_hole_p_max,ia,iz,i_hole_sum
-
-        type(level_typ),dimension(:), allocatable :: levn,levp  
-
-        i_hole_sum=0
-        do i=1,i_hole_n_max
-          i_hole_sum=i_hole_sum+levn(i)%j+1
-        enddo
-
-        write(*,*)'# of neutron occupied states ',i_hole_sum
-        if (i_hole_sum.ne.(ia-iz)) write(*,*) 'WARNING: # of neutron occupied states different from N!'
-
-        i_hole_sum=0
-        do i=1,i_hole_p_max
-          i_hole_sum=i_hole_sum+levp(i)%j+1
-        enddo
-
-        write(*,*)'# of proton occupied states ',i_hole_sum
-        if (i_hole_sum.ne.iz) write(*,*) 'WARNING: # of protom occupied states different from Z!'
-    
-
-    end subroutine check_NZ
 
 end module input_sp
 

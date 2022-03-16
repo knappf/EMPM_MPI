@@ -73,13 +73,31 @@
 !     J and Parity intervals       
       ipmin=-1
       ipmax=1
+
+
       jmin=0
       jmax=2*jmax
+      write(*,*)'ipmin,ipmax?'
+      read(*,*)ipmin,ipmax
+      write(*,*)'jmin,jmax?'
+      read(*,*)jmin,jmax 
 
       write(*,*)'2-phonon calculation parity interval: ','<',ipmin,',',ipmax,'     >'
       write(*,*)'                         J  interval: ','<',jmin,',',jmax,'     >'  
 
-      do ipar=ipmin,ipmax,2 
+      do ipar=ipmin,ipmax,2
+
+!            if (ipar == -1 ) then
+!                        jmin=1
+!                        jmax=3
+!            endif
+
+!            if (ipar == 1 ) then
+!                       jmin=0
+!                       jmax=2
+!            endif
+
+
         do jcal=jmin,jmax,1
             write(*,*)
             write(*,*)'----------------------------------------------'
@@ -88,12 +106,19 @@
         enddo
       enddo  
 
-!      CALL execute_command_line('./run_dens2.sh' )           
-!      write(*,*)'2-phon dens. calculated'
-!      stop
 
+      do ipar=ipmin,ipmax,2 !,-2 
 
-      do ipar=ipmin,ipmax,2 !,-2        
+!            if (ipar == -1 ) then
+!                  jmin=1
+!                  jmax=3
+!            endif
+
+!            if (ipar == 1 )  then
+!                    jmin=0
+!                    jmax=2
+!            endif
+
       do jcal=jmin,jmax,1
      
 
@@ -203,8 +228,8 @@
 
       write(*,*)' idphontot =',idphontot      
       do j=1,no
-       write(12)(xr(i,j),i=1,idphontot)
-       write(22)(vr(i,j),i=1,no)
+       write(12)(real(xr(i,j)),i=1,idphontot)
+       write(22)(real(vr(i,j)),i=1,no)
       enddo
 
       nlam=nlam+no

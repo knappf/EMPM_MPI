@@ -69,8 +69,8 @@ call MPI_COMM_SIZE( MPI_COMM_WORLD, numprocs, ierr )
       jmax=jmaxn
       
       if (myid.eq.0) write(*,*)'energy threshold for 1 phonon states'
-      xthrun_min=0.0
-      xthrun_max=1000000000.0
+      xthrun_min=-10000000000.0
+      xthrun_max=10000000000.0
       if (myid.eq.0) write(*,*)xthrun_min,xthrun_max
  
 

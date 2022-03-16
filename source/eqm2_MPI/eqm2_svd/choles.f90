@@ -34,7 +34,7 @@ module choleski
       nx=0 
 
       
-      tol=0.0001d0
+      tol=0.000001d0
 
       write(*,*)' dimension = ',ndim
             

@@ -313,7 +313,7 @@ module read_inter
        l=i_l
 
     
-    if (i.le.nlevmaxp.and.k.le.nlevmaxp.and.j.le.nlevmaxp.and.l.le.nlevmaxp) fp(ijt,i,j,k,l)=vint
+    if (i.le.nlevmaxp.or.k.le.nlevmaxp.or.j.le.nlevmaxp.or.l.le.nlevmaxp) fp(ijt,i,j,k,l)=vint
 
     enddo
     close(1)
@@ -328,7 +328,7 @@ module read_inter
        k=i_k
        l=i_l
 
-    if (i.le.nlevmaxn.and.k.le.nlevmaxn.and.j.le.nlevmaxn.and.l.le.nlevmaxn) fn(ijt,i,j,k,l)=vint
+    if (i.le.nlevmaxn.or.k.le.nlevmaxn.or.j.le.nlevmaxn.or.l.le.nlevmaxn) fn(ijt,i,j,k,l)=vint
    
     enddo
     close(1)
@@ -346,7 +346,7 @@ module read_inter
          k=i_k
          l=i_l
       
-         if (i.le.nlevmaxp.and.j.le.nlevmaxp.and.k.le.nlevmaxn.and.l.le.nlevmaxn) fpn(ijt,i,j,k,l)=vint
+         if (i.le.nlevmaxp.or.j.le.nlevmaxp.or.k.le.nlevmaxn.or.l.le.nlevmaxn) fpn(ijt,i,j,k,l)=vint
       
    enddo
       

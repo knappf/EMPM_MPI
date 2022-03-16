@@ -16,7 +16,8 @@
       
         integer                 :: is
         integer                 :: ig     
-        double precision   :: am
+!        double precision   :: am
+        real(kind=4) :: am
 
       END TYPE amp2_typ
 

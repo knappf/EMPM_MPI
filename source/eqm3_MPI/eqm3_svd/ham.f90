@@ -873,6 +873,8 @@ enddo
 ! write(99,'(1000f15.10)')(hamd(i,j),j=1,dim_base)
 !enddo
 
+deallocate(amatr,d1,hami)
+
 write(*,*)' check dim_ind =',ii
 write(*,*)'X calculation'
 
@@ -892,7 +894,7 @@ call normalize_c(no,ndim,ndimr,vr,xr,mxtr,nx,jcal)
 
 
 ! test  C^T (AD) C
-deallocate(amatr)
+!deallocate(amatr)
 allocate(amatr(no,no))
 amatr=0.0d0
 

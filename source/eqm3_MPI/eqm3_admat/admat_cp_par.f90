@@ -580,7 +580,7 @@ endif
 
       open(ifile,file='scratch/'//fname//'_'//nlam,status='unknown',form='unformatted')
 
-      ndro=15000000
+      ndro=35000000
       ndgg=0
 
       if (.not.allocated(ron)) allocate (ron(ndro))
@@ -1080,7 +1080,7 @@ endif
 
       character(len=30)fname
 
-      ndipo=100
+      ndipo=250
 
       if (.not.allocated(ipozbr)) allocate(ipozbr(iamax,ifonmx,ndipo))
       ipozbr=0

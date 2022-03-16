@@ -91,6 +91,16 @@
       iparmx=1    
       jminn=0      ! minimal J
       beta=0.0d0
+!      read(1,26)alfa,beta
+!      read(1,*)
+!      read(1,15)iparmn,iparmx
+!      read(1,15)jminn,jmaxn
+!      read(1,*)
+!      read(1,15)ihnmnc,ihnmxc
+!      read(1,15)ihpmnc,ihpmxc
+!      read(1,15)ipnmnc,ipnmxc
+!      read(1,15)ippmnc,ippmxc
+
 
       close(1)
 
@@ -104,9 +114,6 @@
 
       
       call inp_sp(levn,levp,jmaxn)
-
-      call check_NZ(ia,iz,ihnmx,ihpmx,levn,levp)
-
 !      call input_kin(kin_p,kin_n)   ! natural orbitals only
 
       jmaxn=0
@@ -389,11 +396,11 @@
           endif
 
 !         
-!          write(777,33)          
-!          write(777,*)'A matr '
-!          do i=1,ndmx
-!          write(777,33)(amtr(i,j),j=1,ndmx)
-!          enddo
+          write(777,33)          
+          write(777,*)'TDA matr  J= ',ijj,' Parity = ',ipar 
+          do i=1,ndmx
+           write(777,33)(amtr(i,j),j=1,ndmx)
+          enddo
 
  
  
@@ -402,7 +409,7 @@
           write(777,33)          
           write(777,*)'vl. vektory A'
           do i=1,ndmx
-            write(777,33)(amtr(i,j),j=1,ndmx)
+          write(777,33)(amtr(i,j),j=1,ndmx)
           enddo
           
  
@@ -520,7 +527,15 @@
         write(tnf,101)nlam+i
         write(33)nlam+i,ipar,ijj,e(i)
         if (ipar.eq.-1.and.ijj.eq.1.and.tcm.eq.'y') write(881,*)nlam+i,e(i),amtrold(i,ndmx)
- 
+        write(94,*)
+        write(94,*)'________________________________________'
+        write(94,*)
+        write(94,*)'i     Parity    J        energy '
+        write(94,'(3i5,f10.5)')nlam+i,ipar,ijj,e(i)
+        write(94,*)
+!c        open(2,file='1phonon/1f_cp.'//tnf//''
+!c     *,status='unknown',form='unformatted')
+
         iii=0
 
         do ii=1,idphp
@@ -534,6 +549,50 @@
 
 
         write(2)(iphp(ipozi(j))%par,iphp(ipozi(j))%hol,amtr(ipozi(j),i),j=1,iii)
+!c        close(2)
+
+        write(94,*)'- proton p(h)^-1 -'
+
+        do ill=1,iii
+         if (dabs(amtr(ipozi(ill),i)).gt.5.d-2) then 
+!         write(94,'(2i5,f10.5)')iphp(ipozi(ill))%par,
+!     *iphp(ipozi(ill))%hol,
+!     *amtr(ipozi(ill),i)
+
+
+       write(94,'(i2,a2,i2,5x,i2,a2,i2,5x,f10.5)')levp(iphp(ipozi(ill))%par)%nr,orbit(levp(iphp(ipozi(ill))%par)%l),levp(iphp(ipozi(ill))%par)%j,levp(iphp(ipozi(ill))%hol)%nr,orbit(levp(iphp(ipozi(ill))%hol)%l),levp(iphp(ipozi(ill))%hol)%j,amtr(ipozi(ill),i)
+
+
+         endif
+        enddo
+
+!        write(94,*)'- neutron p(h)^-1 -'
+
+!        do ill=1,iii
+!         if (dabs(amtr(ipozi(ill)+idphp,i)).gt.5.d-2) then
+!         write(94,'(2i5,f10.5)')iphn(ipozi(ill))%par,
+!     *iphn(ipozi(ill))%hol,
+!     *amtr(ipozi(ill)+idphp,i)
+
+
+!       write(94,'(i2,a2,i2,5x,i2,a2,i2,5x,f10.5)')levn(iphn(ipozi(ill))%par)%nr,orbit(levn(iphn(ipozi(ill))%par)%l),levn(iphn(ipozi(ill))%par)%j,levn(iphn(ipozi(ill))%hol)%nr,orbit(levn(iphn(ipozi(ill))%hol)%l),levn(iphn(ipozi(ill))%hol)%j,amtr(ipozi(ill)+idphp,i)
+
+
+!         endif
+!        enddo
+
+
+!c       ph content
+
+        do iph=1,iii
+
+          ippp=iphp(ipozi(iph))%par
+          ihhh=iphp(ipozi(iph))%hol
+          nroz=levp(ippp)%n-levp(ihhh)%n
+          xsumph(nlam+i,nroz)=xsumph(nlam+i,nroz)+amtr(ipozi(iph),i)**2.d0
+        enddo
+
+!c        write(743,*)xsum
 
       enddo
        
@@ -546,6 +605,9 @@
       do i=1,ndmx
         write(tnf,101)nlam+i
 
+!c        open(2,file='1phonon/1f_cn.'//tnf//''
+!c     *,status='unknown',form='unformatted')
+
         iii=0
 
         do ii=1,idphn
@@ -555,40 +617,68 @@
          endif
         enddo
         
+        write(94,*)'- neutron p(h)^-1 -'
+
+        do ill=1,iii
+         if (dabs(amtr(ipozi(ill)+idphp,i)).gt.5.d-2) then
+!         write(94,'(2i5,f10.5)')iphn(ipozi(ill))%par,
+!     *iphn(ipozi(ill))%hol,
+!     *amtr(ipozi(ill)+idphp,i)
+
+
+       write(94,'(i2,a2,i2,5x,i2,a2,i2,5x,f10.5)')levn(iphn(ipozi(ill))%par)%nr,orbit(levn(iphn(ipozi(ill))%par)%l),levn(iphn(ipozi(ill))%par)%j,levn(iphn(ipozi(ill))%hol)%nr,orbit(levn(iphn(ipozi(ill))%hol)%l),levn(iphn(ipozi(ill))%hol)%j,amtr(ipozi(ill)+idphp,i)
+
+
+         endif
+        enddo
+
                 
+
         write(4)ipar,ijj,iii
         write(4)(iphn(ipozi(j))%par,iphn(ipozi(j))%hol,amtr(ipozi(j)+idphp,i),j=1,iii)
+!c        close(2)
+
+
+        do iph=1,iii
+
+          ippp=iphn(ipozi(iph))%par
+          ihhh=iphn(ipozi(iph))%hol
+          nroz=levn(ippp)%n-levn(ihhh)%n
+
+          xsumph(nlam+i,nroz)=xsumph(nlam+i,nroz)+amtr(ipozi(iph)+idphp,i)**2.d0
+        enddo
+
+!        write(743,742)nlam+i,ipar,ijj,e(i),
+!     *xsumph(nlam+i,1),xsumph(nlam+i,2),xsumph(nlam+i,3)
+!     *,xsumph(nlam+i,4),xsumph(nlam+i,5)
+ 
+!        if (xsumph(nlam+i,1).gt.0.3d0) 
+!     *write(99,*)nlam+i
+
+!c,xsumph(nlam+i,6)
+!c       *,xsumph(nlam+i,7),xsumph(nlam+i,8),xsumph(nlam+i,9)
+
 
       enddo
 
       deallocate(ipozi) 
-
-    do i=1,ndmx
-
-      write(94,*)
-      write(94,*)'----------------------'
-      write(94,*)'   i   Par   J     en '
-      write(94,'(3i5,f10.5)')nlam+i,ipar,ijj,e(i)
-      write(94,*)
-
-       write(94,*)'- proton p(h)^-1 -'
-       do ill=1,idphp
-        if (dabs(amtr(ill,i)).gt.5.d-2) then 
-          write(94,'(i2,a2,i2,5x,i2,a2,i2,5x,f10.5)')levp(iphp(ill)%par)%nr,orbit(levp(iphp(ill)%par)%l),levp(iphp(ill)%par)%j,levp(iphp(ill)%hol)%nr,orbit(levp(iphp(ill)%hol)%l),levp(iphp(ill)%hol)%j,amtr(ill,i)
-        endif
-       enddo
-       write(94,*)
-
-      write(94,*)'- neutron p(h)^-1 -'
-      do ill=1,idphn
-       if (dabs(amtr(ill+idphp,i)).gt.5.d-2) then
-          write(94,'(i2,a2,i2,5x,i2,a2,i2,5x,f10.5)')levn(iphn(ill)%par)%nr,orbit(levn(iphn(ill)%par)%l),levn(iphn(ill)%par)%j,levn(iphn(ill)%hol)%nr,orbit(levn(iphn(ill)%hol)%l),levn(iphn(ill)%hol)%j,amtr(ill+idphp,i)
-       endif
-      enddo
-    enddo
-   
      
-                    
+                      
+!          deallocate(amtr,work,e)
+
+          do i=1,ndmx           
+          write(743,742)nlam+i,ipar,ijj,e(i),xsumph(nlam+i,0),xsumph(nlam+i,1),xsumph(nlam+i,2),xsumph(nlam+i,3),xsumph(nlam+i,4),xsumph(nlam+i,5),xsumph(nlam+i,6),xsumph(nlam+i,1)+xsumph(nlam+i,2)+xsumph(nlam+i,3)+xsumph(nlam+i,4)+xsumph(nlam+i,0)+xsumph(nlam+i,5)+xsumph(nlam+i,6)
+      
+         if (xsumph(nlam+i,1).gt.0.1d0) write(91,*)nlam+i,e(i)
+         if (xsumph(nlam+i,2).gt.0.1d0) write(92,*)nlam+i,e(i)
+         if (xsumph(nlam+i,3).gt.0.1d0) write(93,*)nlam+i,e(i)
+         if (xsumph(nlam+i,4).gt.0.1d0) write(944,*)nlam+i,e(i)
+         if (xsumph(nlam+i,0).gt.0.1d0) write(90,*)nlam+i,e(i)
+
+
+
+          enddo
+
 
           deallocate(amtr,work,e)
 

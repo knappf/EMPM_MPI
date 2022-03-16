@@ -25,7 +25,7 @@ include 'types_phon_dens.inc'
 
       type (phon_typ), dimension (:,:), allocatable :: phonbs
       integer, dimension (:), allocatable :: nphon,iphous,iphous2,ipozl
-      double precision, dimension (:,:,:), allocatable :: xx
+      real(kind=4), dimension (:,:,:), allocatable :: xx
       double precision, dimension (:,:,:,:,:,:), allocatable :: csixj
       double precision, dimension (:,:), allocatable :: rog
       integer,dimension(:),allocatable :: idimnp,idimnh,idimph,idimpp
@@ -1070,13 +1070,16 @@ end subroutine roo
       !      include 'types_phon_dens.inc'
       
             type (amp2_typ), dimension(:), allocatable :: xcc
-            double precision, dimension (:,:,:), allocatable :: cc
+      !      double precision, dimension (:,:,:), allocatable :: cc
+
+            real (kind=4), dimension (:,:,:), allocatable :: cc
+
             integer, dimension (:), allocatable :: ndcc,iphous2,ipozl
             real :: xxr
             character(len=30)fname
       
             allocate (cc(n1,n2,n3))
-            cc=0.0d0
+            cc=0.0
             illl=1
       
             open(2,file=fname,status='old',form='unformatted')

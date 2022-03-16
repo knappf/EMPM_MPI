@@ -8,8 +8,8 @@
 EXF= phon_int_MPI
 EXE_PATH=../../${EMPM_BIN_DIR}
 #
-all: eof_mod.o input_sp.o anglib.o interac_part_fast5_cut.o phon_int.o
-	$(XLFMPI) eof_mod.o input_sp.o anglib.o interac_part_fast5_cut.o phon_int.o ${OPT} -o ${EXE_PATH}${EXF}
+all: eof_mod.o input_sp.o anglib.o interac.o phon_int.o
+	$(XLFMPI) eof_mod.o input_sp.o anglib.o interac.o phon_int.o ${OPT} -o ${EXE_PATH}${EXF}
 
 eof_mod.o: eof_mod.f90
 	${XLFMPI} -c eof_mod.f90
@@ -20,8 +20,8 @@ input_sp.o: input_sp.f90
 anglib.o: anglib.f90
 	${XLFMPI} -c anglib.f90
 
-interac_part_fast5_cut.o: interac_part_fast5_cut.f90 
-	${XLFMPI} -c interac_part_fast5_cut.f90
+interac.o: interac.f90 
+	${XLFMPI} -c interac.f90
 
 phon_int.o: phon_int.f90
 	${XLFMPI} -c phon_int.f90

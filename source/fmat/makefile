@@ -20,6 +20,4 @@ clean:
 	rm -f ${EXE_PATH}${EXF}
 
 
-
-
 	
