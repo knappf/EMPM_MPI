@@ -440,12 +440,24 @@ endif
 
 !  copy of <spur| H | phys > correction 
 
-allocate(h_corr(no,ns))
+!allocate(h_corr(no,ns))
+
+!do i=1,no
+!do j=1,ns
+!h_corr(i,j)=h_orig(i,j)
+!enddo
+!enddo
+
+!with the new diag routine the spurious states are the last of h and not the
+!first as before
+
+jc=no-ns+1
+allocate(h_corr(no,jc:no))
 
 do i=1,no
-do j=1,ns
-h_corr(i,j)=h_orig(i,j)
-enddo
+  do j=jc,no!1,ns
+    h_corr(i,j)=h_orig(i,j)
+  enddo
 enddo
 
 
