@@ -911,7 +911,8 @@ endif
 !with the new diag routine the spurious states are the last of h and not the
 !first as before
 
-jc=no-ns+1
+jc=no-ns+1 
+
 allocate(h_corr(no,jc:no))
 
 do i=1,no
