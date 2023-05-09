@@ -8,7 +8,7 @@
 
 !   include 'types_eqm.inc'
 
-   subroutine admat(nf,ipar,jcal,phonbs,ndim,no,phon1,phon2,mxt,myid,numprocs,i_resh)
+   subroutine admat(nf,ipar,jcal,phonbs,ndim,no,phon1,phon2,mxt,xcc,ndcc,ipozx,ndbx)
 
    use anglib
    use input_sp
@@ -21,11 +21,11 @@
    integer, dimension (:), allocatable :: phonus, phonmus
    type(phon_typ), dimension (:), allocatable :: phon1,phon2,phon3
    type(phonbase_typ), dimension (:), allocatable :: phonbs
-   type(rho_typ), dimension(:), allocatable :: ronp,ropp,ronh,roph
+   type(rho2_typ), dimension(:), allocatable :: ronp,ropp,ronh,roph
    type(level_typ),dimension(:), allocatable :: levn,levp
 
    type (amp2_typ), dimension(:,:), allocatable :: xcc
-   integer, dimension (:), allocatable :: ndcc,ig_resh
+   integer, dimension (:), allocatable :: ndcc
 
 
    double precision, dimension(:,:,:,:),allocatable :: ronp1,ropp1,ronh1,roph1
@@ -34,7 +34,7 @@
 
    double precision, dimension(:,:,:,:,:), allocatable :: csixj,csixjd
 
-   integer, dimension(:), allocatable :: nx,mxt,mxtr,i_resh
+   integer, dimension(:), allocatable :: nx,mxt,mxtr
 
    integer, dimension (:,:,:), allocatable :: ipozbr
    integer, dimension (:,:,:), allocatable ::  ipozx
@@ -42,18 +42,11 @@
 
 
    integer, dimension (:,:), allocatable :: ndbr
-   double precision, dimension (:,:), allocatable :: rtdaovr
-   double precision, dimension (:), allocatable :: h_corr
+   double precision, dimension (:,:), allocatable :: rtdaovr,h_corr
    double precision, dimension (:), allocatable :: a_m,d_m
 
 
    character*30 namernp,namerpp,namernh,namerph,namefnp,namefpp,namefnh,namefph,namernp1,namerpp1,namernh1,namerph1,namex,namep3
-   character(len=100) run_dens2_alpha
-   character(len=15)alpha_char
-   character*15 row_number
-
-   integer myid,numprocs
-
 
     allocate(rtdaovr(0:5000,0:5000))
     rtdaovr=0.0d0
@@ -65,10 +58,10 @@
      do while (.not.eof(881))
       read(881,*)iii,eee,rr
     enddo
-    close(881)
+     close(881)
 
-    ilamcm=iii
-    if (myid.eq.0) write(*,*)' CM phonon is number ',ilamcm
+      ilamcm=iii
+      write(*,*)' CM phonon is number ',ilamcm
 
      open(881,file='tda_r_overl.dat',status='unknown',form='formatted')
       do while (.not.eof(881))
@@ -80,8 +73,33 @@
 
      if (ilamcm.eq.0) rtdaovr=0.0d0 
      phon1(ilamcm)%enf=rtdaovr(ilamcm,ilamcm)
-     phon2(ilamcm)%enf=rtdaovr(ilamcm,ilamcm)
+!      phon2(ilamcm)%enf=rtdaovr(ilamcm,ilamcm)
       
+      if (nf.gt.2) then
+
+      idp3=10000
+      allocate(phon3(idp3))
+
+      if (nf.eq.3) namep3='1phonon/1f_states.dat'
+
+      open (3,file=namep3,status='old',form='unformatted')
+
+      do while (.not.eof(3))
+       read(3)i,ipart,ijj,en
+       if (i.gt.idp3) then
+               stop
+               write(*,*)' Increase dimension of phon3'
+       endif
+
+       phon3(i)%par=ipart
+       phon3(i)%j=ijj
+       phon3(i)%enf=en
+       phon3(i)%us=1
+      enddo
+
+      close(3)
+
+      endif
 
     open(2,file='mxtr.dat',status='unknown',form='unformatted')
      read(2)idphontr
@@ -90,9 +108,12 @@
     close(2)
  
      no=idphontr
-      
- 
-!      namex='2phonon/2f_x.dat'
+
+      open(6,file='a_mat.dat',status='unknown',form='unformatted')
+      open(7,file='d_mat.dat',status='unknown',form='unformatted')
+
+
+      namex='2phonon/2f_x.dat'
      
 !      if (ifrun.eq.0) then  
 !       call readx(namex,xcc,ndcc,iamax)
@@ -108,16 +129,53 @@
       namefnh='V_phon_h_n.dat'
       namefph='V_phon_h_p.dat'
 
- 
-      call read_input_par(ihp_min,ihp_max,ihn_min,ihn_max,ipp_min,ipp_max,ipn_min,ipn_max,isi_max,ndla_max)
+      if (nf.eq.2) then
+!      namerpp='1phonon/1f_rpp.dat'
+!      namernp='1phonon/1f_rnp.dat'
+ !     namerph='1phonon/1f_rph.dat'
+ !     namernh='1phonon/1f_rnh.dat'
+
+ !     namernp1='1phonon/1f_rnp1.dat'
+ !     namerpp1='1phonon/1f_rpp1.dat'
+ !     namernh1='1phonon/1f_rnh1.dat'
+ !     namerph1='1phonon/1f_rph1.dat'
+
+      endif
+
+!      open(33,file=namernp,status='old',form='unformatted')
+!      open(34,file=namerpp,status='old',form='unformatted')
+!      open(43,file=namernh,status='old',form='unformatted')
+ !     open(44,file=namerph,status='old',form='unformatted')
+
+!      open(331,file=namefnp,status='old',form='unformatted')
+!      open(341,file=namefpp,status='old',form='unformatted')
+!      open(431,file=namefnh,status='old',form='unformatted')
+!      open(441,file=namefph,status='old',form='unformatted')
+
+!      open(332,file=namernp1,status='old',form='unformatted')
+!      open(342,file=namerpp1,status='old',form='unformatted')
+ !     open(432,file=namernh1,status='old',form='unformatted')
+ !     open(442,file=namerph1,status='old',form='unformatted')
+
+      call read_input_par(ihp_min,ihp_max,ihn_min,ihn_max,ipp_min,ipp_max,ipn_min,ipn_max,isi_max,ndla_max,ndla2_max)
 
 !      write(*,*)ihp_min,ihp_max,ihn_min,ihn_max,ipp_min,ipp_max,ipn_min,ipn_max,isi_max,ndla_max
       ndla=ndla_max
       nsi=2*isi_max
 
-      ndla2=ndla_max
+      ndla2=ndla2_max
 
-!      allocate(h_corr(ndla2))
+!  correction <spur|H|phys>
+      allocate(h_corr(ndla2,ndla2))
+      h_corr=0.d0
+      open(881,file='h_corr.dat',status='unknown',form='formatted')
+       do while (.not.eof(881))
+        read(881,*)i,j,h_corr(i,j)
+        h_corr(j,i)=h_corr(i,j)
+        phon2(j)%enf=h_corr(j,j)
+       enddo
+      close(881)       
+
 
 
 !      n1mn=1
@@ -162,77 +220,42 @@
        enddo
       enddo
 
-!      write(6)idphontr,ndim
-!      write(7)idphontr,ndim
-
-
+      write(6)idphontr,ndim
+      write(7)idphontr,ndim
 
       allocate(a_m(ndim),d_m(ndim))
-
-
-
 
       do i=1,idphontr
 
        iii=mxtr(i)
        iaa=phonbs(iii)%ilap  ! 1phonon index
        ia=phonbs(iii)%ila    ! n-1 phonon index
+       write(912,*)' **** ',i,iaa,ia
 
       enddo
 
-      allocate(ig_resh(idphontr))
+
+
       do i=1,idphontr
-       ig_resh(i)=i
-      enddo
-
-      call rperm(idphontr,ig_resh)
-
-    if (mod(idphontr,numprocs).eq.0) then
-            n_seg=idphontr/numprocs
-    else
-            n_seg=idphontr/numprocs+1
-    endif
-
-    if (myid.eq.0) write(*,*) ' size of segment = ',n_seg
-
-
-     do irs=myid*n_seg+1,min((myid+1)*n_seg,idphontr)
-      i=ig_resh(irs)
-
-      write(row_number,'(i15.15)')i
-      open(6,file='./scratch/a_mat_'//row_number,status='unknown',form='unformatted')
-      open(7,file='./scratch/d_mat_'//row_number,status='unknown',form='unformatted')
-
-      
-  
        a_m=0.d0
        d_m=0.d0
 
        iii=mxtr(i)
+       write(725,*)' **** ',i,idphontr
        iaa=phonbs(iii)%ilap  ! 1phonon index
        ia=phonbs(iii)%ila    ! n-1 phonon index
+
+
        jila=phon1(iaa)%j
        jial=phon2(ia)%j
 
 
-
-
-
-
        if (ia.ne.iaold) then
 !            write(*,*)'Reading 2-phon dens',i
-!            write(alpha_char,*)ia
-!            run_dens2_alha='./phon_dens2'//alpha_char
-!            CALL execute_command_line('./phon_dens2'//alpha_char//' > log_dens2 2> error_dens')
-!            CALL execute_command_line('./phon_dens2 $ALPHA_CAL' )
-!            write(*,*)' densities for ia=',ia,'calculated'
-
-
-
-            call readro('1f_rnp.dat',ia,ronp,nronp)
-            call readro('1f_rpp.dat',ia,ropp,nropp)
-            call readro('1f_rnh.dat',ia,ronh,nronh)
-            call readro('1f_rph.dat',ia,roph,nroph)
+            call readro('2f_rnp.dat',ia,ronp,nronp)
+            call readro('2f_rpp.dat',ia,ropp,nropp)
+            call readro('2f_rnh.dat',ia,ronh,nronh)
+            call readro('2f_rph.dat',ia,roph,nroph)
             iaold=ia
             call redrsum(ndla2,ronp,nronp,ropp,nropp,ronh,nronh,roph,nroph,ipozbr,ndbr)
 
@@ -291,9 +314,8 @@
           endif
           if (iaa.eq.ibb.and.ia.ne.ib) then
 !              write(*,*)'***'
-             aa=aa+rtdaovr(ia,ib)
-!            aa=aa+h_corr(ia,ib)
-!            aa=aa+h_corr(ib)
+!             aa=aa+rtdaovr(ia,ib)
+            aa=aa+h_corr(ia,ib)
 !            aa=aa+h_corr(ib,ia)
           endif
 
@@ -308,6 +330,48 @@
           if ((ia.eq.ibb).and.(ib.eq.iaa)) then
             dd=dd+xsixj*(dfloat(2*jla+1)*(2*jlap+1))**0.5d0
           endif
+        endif
+
+        if (nf.gt.2) then
+
+         if (ia.eq.ib.and.iaa.eq.ibb) dd=dd+1.d0
+          jlap=phon1(ibb)%j
+          jla=phon1(iaa)%j
+          jial=phon2(ia)%j
+          jialp=phon2(ib)%j
+
+          faz=dfloat((-1)**(jlap+jla+jial+jialp))
+
+          do iiii=1, ndbx(ia,ibb) ! ndbx ()ndcc(ia)
+
+          ii=ipozx(ia,ibb,iiii)
+
+          if (xcc(ia,ii)%is.eq.ibb) then
+
+           do jjjj=1,ndbx(ib,iaa) !ndcc(ib)
+           jj=ipozx(ib,iaa,jjjj)
+
+           if (xcc(ib,jj)%is.eq.iaa) then
+
+
+            if (xcc(ia,ii)%ig.eq.xcc(ib,jj)%ig) then
+
+               jg=phon3(xcc(ia,ii)%ig)%j
+
+!              xsixj=csixj(jla,jg,jialp,jlap,jcal,jial)
+              xsixj=sixj(2*jla,2*jg,2*jialp,2*jlap,2*jcal,2*jial)
+
+              dd=dd+xcc(ia,ii)%am*xcc(ib,jj)%am*xsixj*faz
+
+             endif
+
+            endif
+
+            enddo
+
+           endif
+          enddo
+
         endif
 
 
@@ -430,8 +494,7 @@
        write(6)(a_m(jjj),jjj=1,ndim)
        write(7)(d_m(jjj),jjj=1,ndim)
 
-       close(6)
-       close(7)
+
 
       enddo  ! over i
 
@@ -467,15 +530,15 @@
       include 'formats_eqm.inc'
 !!      include 'types_eqm.inc'
 
-      type(rho_typ), dimension(:), allocatable :: ron
+      type(rho2_typ), dimension(:), allocatable :: ron
 
       character(len=10)fname
-      character(len=4)nlam
+      character(len=6)nlam
       logical je_tam
 
       ifile=33
  
-      write(nlam,'(i4.4)')ig
+      write(nlam,'(i6.6)')ig
 
       inquire(file='scratch/'//fname//'_'//nlam,exist=je_tam)
 
@@ -524,7 +587,7 @@
       include 'formats_eqm.inc'
 !      include 'types_eqm.inc'
 
-      type(rho_typ), dimension(:), allocatable :: ronp,ropp,ronh,roph
+      type(rho2_typ), dimension(:), allocatable :: ronp,ropp,ronh,roph
       integer, dimension (:,:,:), allocatable :: ipozbr
       integer, dimension (:,:), allocatable :: ndbr
 
@@ -625,7 +688,7 @@
       open(ifile,file='scratch/'//fname//'_'//nlam,status='unknown',form='unformatted')
 
 
-      ndro=29000000
+      ndro=5000000
       ndgg=0
 
       if (.not.allocated(ronn)) allocate (ronn(ndro))
@@ -697,7 +760,7 @@
  
       open(ifile,file='scratch/'//fname//'_'//nlam,status='unknown',form='unformatted')
 
-      ndro=29000000
+      ndro=5000000
       ndgg=0
 
       if (.not.allocated(ronn)) allocate (ronn(ndro))
@@ -847,7 +910,7 @@
 
       end subroutine loadsp
 !
-      subroutine  read_input_par(ihp_min,ihp_max,ihn_min,ihn_max,ipp_min,ipp_max,ipn_min,ipn_max,isi_max,ndla_max)
+      subroutine  read_input_par(ihp_min,ihp_max,ihn_min,ihn_max,ipp_min,ipp_max,ipn_min,ipn_max,isi_max,ndla_max,ndla2_max)
 
 
       include 'formats_eqm.inc'
@@ -878,6 +941,17 @@
       enddo
 
       ndla_max=i
+
+      name1f='2phonon/2f_states.dat'
+
+      open (3,file=name1f,status='old',form='unformatted')
+
+      do while (.not.eof(3))
+       read(3)i,ipar,ijj,en
+      enddo
+
+      ndla2_max=i
+
 
       close(3)
 
@@ -924,7 +998,7 @@
 
       ilamp=0
 
-      ndimj=13000
+      ndimj=40000
 
       allocate(xcc(nd2f,ndimj))
       allocate(ndcc(nd2f))
@@ -983,7 +1057,7 @@
 
       character(len=30)fname
 
-      ndipo=100
+      ndipo=1000
 
       if (.not.allocated(ipozbr)) allocate(ipozbr(iamax,ifonmx,ndipo))
       ipozbr=0
@@ -1013,36 +1087,6 @@
       return
       end subroutine redrsumx
 
-
 !***********************************************************************
-!-----------------------------------------------------------------
-subroutine rperm(N, p)
-
- integer(kind=4), intent(in) :: N
- integer(kind=4), dimension(:), intent(out) :: p
-
- integer(kind=4) :: i
- integer(kind=4) :: k, j, ipj, itemp, m
- real(kind=4), dimension(100) :: u
-
-p = (/ (i, i=1,N) /)
-
-! Generate up to 100 U(0,1) numbers at a time.
-do i=1,N,100
-m = min(N-i+1, 100)
-call random_number(u)
-do j=1,m
-ipj = i+j-1
-k = int(u(j)*(N-ipj+1)) + ipj
-itemp = p(ipj)
-p(ipj) = p(k)
-p(k) = itemp
-end do
-end do
-return
-
-end subroutine rperm
-!--------------------------------------------------------------
-
 
       end module admatr

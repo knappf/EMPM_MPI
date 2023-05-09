@@ -126,7 +126,7 @@ if (myid.eq.0) then
 endif
 
       ndamp=10000
-      ndrho=10000000     
+      ndrho=20000000     
 
       allocate (camp(ndamp))
 !      allocate (jphon(ifmx))

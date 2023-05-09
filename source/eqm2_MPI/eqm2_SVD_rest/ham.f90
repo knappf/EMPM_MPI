@@ -1,4 +1,4 @@
-!c     last modification 11.5.2018
+!     last modification 18.4.2023
 
 module hami
 
@@ -7,508 +7,6 @@ use read_admat
 
 contains
 
-subroutine ham(ndim,ndimr,no,nor,ns,irow,wr,xr,vr,ipar,jcal,mxtr,phonbs,nx,h_corr)
-
-      use choleski
-      use cm_ort_svd
-
-      implicit double precision (a-h,o-z)
-       
-!      include 'types_eqm.inc'
-      include 'formats_eqm.inc'
-
-      type(phonbase_typ), dimension (:), allocatable :: phonbs
-      double precision, dimension(:,:), allocatable :: d1,amatr,hami,hamid,dmatr,cq,vr,d1r,hamir,hamidr,hamd,xr
-      double precision, dimension(:,:), allocatable :: d_orig,h_orig,h_corr
-     
-      double precision, dimension(:), allocatable ::  work,wr,wi,wro
-
-      integer, dimension(:), allocatable :: mxt,nxt,mxtr,ipoz,irow,nx
-
-      double precision, dimension (:), allocatable :: s
-      double precision, dimension (:,:), allocatable :: vt
-      integer, dimension (:), allocatable :: ind_red
-      logical :: decoup_cm
-
-
-!c      allocate(mxt(ndimr))
-!c      mxt=0
-
-
-!c      open(6,file='mxt.dat',status='old',form='unformatted')
-
-!c      ii=0
-!c      do while (.not.eof(6))
-!c      read(6)i,mm
-!c       ii=ii+1
-!c       mxt(i)=mm
-!c      enddo
-
-!c      write(*,*)' Number of independent states ',ii
-
-!c      close(6)
-
-
-!c      allocate(xr(ndim,no))
-!c      xr=0.d0
-!c      allocate(wr(no))
-!c      wr=0.d0
-
-      write(998,*)'-------------- parity =',ipar,' -- J=',jcal,'------------'  
-
-      allocate(d1(ndimr,ndim))
-      d1=0.d0
-
-      allocate(amatr(ndimr,ndim))
-      amatr=0.d0
-
-      ndimtotal=ndim
-
-
-!      open(6,file='d_mat.dat',status='old',form='unformatted')
-!      read(6)ndimrt,ndimt
-!      if (ndimrt.ne.ndimr.or.ndimt.ne.ndim) then
-!        write(*,*)' Dimensions does not match in D_m file'
-!        stop
-!      endif
-!      do iii=1,ndimrt
-!       read(6)(d1(iii,jjj),jjj=1,ndimt)
-!      enddo
-
-      call read_admatr('./scratch/d_mat_',d1,ndimr,ndim)
-
-      iout=0
-      if (iout.eq.1) then 
-      write(998,*)    
-      write(998,*)'******** matrix  D *************'       
-      write(998,*)
-      do i=1,ndimr
-        write(998,102)(d1(i,j),j=1,ndim)
-      enddo
-      endif
-
-      
-!      do while (.not.eof(6))
-!      read(6)i,j,dd
-!       d1(i,j)=dd
-!      enddo
-
-
-
-!      close(6)
-
-     
-!      open(6,file='a_mat.dat',status='old',form='unformatted')
-
-
-!      read(6)ndimrt,ndimt
-!      if (ndimrt.ne.ndimr.or.ndimt.ne.ndim) then
-!        write(*,*)' Dimensions does not match in A_m file'
-!        stop
-!      endif
-!      do iii=1,ndimrt
-!       read(6)(amatr(iii,jjj),jjj=1,ndimt)
-!      enddo
-
-!      close(6)
-
-      call read_admatr('./scratch/a_mat_',amatr,ndimr,ndim)
-
-      write(*,*)ndim,ndimr
-
-
-      iout=0
-      if (iout.eq.1) then 
-      write(998,*)    
-      write(998,*)'******** matrix  A *************'       
-      write(998,*)
-      do i=1,no
-        write(998,102)(amatr(i,j),j=1,ndim)
-      enddo
-      endif
-
-      allocate(hami(ndimr,ndimr))
-      hami=0.d0
-
-!c      do i=1,no
-!c         ii=i
-!c        do j=1,no
-!c           jj=mxt(j)
-!c           hh=0.d0
-!c          do k=1,ndim
-!c            kk=k
-!c            hh=hh+amatr(ii,kk)*d1(j,k)
-!c          enddo
-!c            hami(i,j)=hh
-!c        enddo 
-!c      enddo
-      
-      call dgemm('N','T',ndimr,ndimr,ndim,1.d0,amatr,ndimr,d1,ndimr,0.d0,hami,ndimr)
-
-      iout=0
-
-      if (iout.eq.1) then 
-      write(998,*)    
-      write(998,*)'******** D  *************'       
-      write(998,*)
-      do i=1,ndim
-        write(998,102)(d1(j,i),j=1,no)
-      enddo
-      endif
-
-!      deallocate(d1)
-
-
-      iout=0
-      if (iout.eq.1) then 
-      write(998,*)    
-      write(998,*)'******** matrix  AD *************'       
-      write(998,*)
-      do i=1,ndimr
-        write(998,102)(hami(i,j),j=1,ndimr)
-      enddo
-      endif
-
-      do i=1,ndimr
-       do j=1,ndimr
-          if (dabs(hami(i,j)-hami(j,i)).gt.0.001d0) then
-           write(*,*)'Non-symmetric AD'
-           write(*,'(2i5,3f10.5)')i,j,hami(i,j),hami(j,i),hami(i,j)-hami(j,i)
-          endif   
-     
-       enddo
-      enddo
-
-      deallocate(amatr)    
-!     SVD part 
-      call dmat_spur_set(ndim,ndimr,no,phonbs,d1,mxtr,nx,s,vt,ns)
-
-    allocate(dmatr(ndimr,ndimr))
-    dmatr=0.0d0 
-
-    do i=1,ndimr
-       do j=1,ndimr
-         dmatr(i,j)=d1(i,mxtr(j))
-       enddo
-    enddo
-      
-     call reduce_mat(nx,hami,ndimr,no)
-     call reduce_mat(nx,dmatr,ndimr,no)
-
-     iout=0
-     if (iout.eq.1) then 
-     write(998,*)    
-     write(998,*)'******** matrix  D after Choleski *************'       
-     write(998,*)
-     do i=1,no
-       write(998,102)(dmatr(i,j),j=1,no)
-     enddo
-
-     write(998,*)    
-     write(998,*)'******** matrix  AD after Choleski *************'       
-     write(998,*)
-     do i=1,no
-       write(998,102)(hami(i,j),j=1,no)
-       
-     enddo
-     endif
-
-!  copies of original AD and D matrices      
-    allocate(h_orig(no,no),d_orig(no,no))
-    h_orig=hami
-    d_orig=dmatr
-     
-! transformation of reduced AD
-!     deallocate(amatr)
-     allocate(amatr(no,no))
-     amat=0.0d0
-   
-     call dgemm('N','T',no,no,no,1.d0,hami,no,vt,no,0.d0,amatr,no)
-     hami=0.d0
-     call dgemm('N','N',no,no,no,1.d0,vt,no,amatr,no,0.d0,hami,no)
-
-   
-   do i=1,no
-    do j=i,no
-!      if (dabs(hami(i,j)-hami(j,i)).gt.0.01d0) write(*,'(2i5,3f10.5)'),i,j,dabs(hami(i,j)-hami(j,i))
-    enddo
-   enddo
-
-! transformation of reduced D
-!   allocate(dmatc_orig(no,no))
-!   dmatc_orig=d1
-   
-   ! deallocate(amat)
-   !  allocate(amat(dim_ind,dim_ind))
-     amatr=0.0d0
-   
-     call dgemm('N','T',no,no,no,1.d0,dmatr,no,vt,no,0.d0,amatr,no)
-     dmatr=0.d0
-     call dgemm('N','N',no,no,no,1.d0,vt,no,amatr,no,0.d0,dmatr,no)
-
-
-
-! decoupling spurious subspace     
-
-     decoup_cm=.true.
-     if (decoup_cm.eq..TRUE.) then 
-            do i=1,ns
-          hami(i,i)=hami(i,i)+100000000.0d0
-!          dmatr(i,i)=1.0d0
-!             do j=ns+1,no
-             do j=ns+1,no
-!              hami(i,j)=0.0d0
-!              hami(j,i)=0.0d0 
-!              dmatr(i,j)=0.0d0
-!              dmatr(j,i)=0.0d0
-             enddo
-
-!             hami(i,i)=1000000.d0
-!             dmatr(i,i)=1.0d0
-           enddo         
-      endif
-   
-   iout=0
-        if (iout.eq.1) then
-         write(998,*)
-         write(998,*)'******** transfromed matrix  D *************'
-         write(998,*)
-         do i=1,no
-           write(998,'(1000f11.6)')(dmatr(i,j),j=1,no)
-         enddo
-        endif
-
-        do i=1,no
-          do j=i,no
-        
-            if (dabs(dmatr(i,j)-dmatr(j,i)).gt.0.01d0) then 
-            write(*,*)' Transformed D asymmetric!'
-            write(*,'(2i5,3f10.5)')i,j,dabs(dmatr(i,j)-dmatr(j,i))
-            endif
-          enddo
-         enddo
-
-
-       iout=0
-        if (iout.eq.1) then
-         write(998,*)
-         write(998,*)'******** transfromed matrix  AD *************'
-         write(998,*)
-         do i=1,no
-           write(998,'(1000f11.6)')(hami(i,j),j=1,no)
-         enddo
-        endif      
-   
-
-   !  Generalized EGV problem
-   
-   ! inverse
-         call dpotrf('U',no,dmatr,no,info)
-         write(*,*)' Factorization info ',info
-   
-         call dpotri('U',no,dmatr,no,info)
-   
-         write(*,*)' Inverse info ',info
-         do i=1,no
-           do j=i+1,no
-             dmatr(j,i)=dmatr(i,j)
-           enddo
-          enddo
-   
-   ! D^-1 AD
-   !      deallocate(dmat)
-         allocate(hamd(no,no))
-         call dgemm('N','N',no,no,no,1.d0,dmatr,no,hami,no,0.d0,hamd,no)
-   
-   !  diag
-         write(*,*)' Diagonalisation '
-         lwork=20*no
-         allocate(work(lwork),wi(no),wr(no),vr(no,no),wro(no))
-         wr=0.d0
-         wro=0.d0
-         wi=0.d0
-         work=0.d0
-         vr=0.d0
-   
-!         if (no.gt.0) then
-   
-         CALL DGEEV('N','V',no,hamd,no,wr,wi,vl,no,vr,no,work,lwork,info)
-         write(*,*)' info=  ',info
-   
-   
-!   write(99,*)' '
-!   write(99,*)'Eigenvalues '
-!   write(99,*)' '
-!   write(99,'(1000f15.10)')(wr(j),j=1,no)
-!   write(99,*)' C (new basis)'
-!   do i=1,no
-!    write(99,'(1000f15.10)')(vr(i,j),j=1,no)
-!   enddo
-   
-  
-   do i=1,no
-  if (dabs(wi(i)).gt.1.d-10) write(*,*)' Imaginary part',i,wi(i)
-   enddo
-   
-   allocate(ipoz(no))
-
-
- do i=1,no
-   ipoz(i)=i
-   wro(i)=wr(i)
- enddo
-
- do i=1,no
-   do j=1,no-i
-     if (wro(j).gt.wro(j+1)) then
-       xe=wro(j)
-       wro(j)=wro(j+1)
-       wro(j+1)=xe
-       ipozz=ipoz(j)
-       ipoz(j)=ipoz(j+1)
-       ipoz(j+1)=ipozz
- endif
- enddo
- enddo
-
-   write(99,*)' Parity = ',ipar, ' J = ',jcal
-   write(99,*)
-!   write(99,*)(wro(i),i=1,no-ns) 
-   write(99,*)(wro(i),i=1,no) 
-   write(99,*)
-
-   
-   
-!   transformation of C to original basis
-
-amatr=0.0d0
-do i=1,ns
-!vt(i,i)=1.0 !?????? preco
-enddo
-
-call dgemm('T','N',no,no,no,1.d0,vt,no,vr,no,0.d0,amatr,no)   !? spravne
-vr=amatr
-!!!!!!!!!!!!!
-! reduce rows of D
-deallocate(hamd)
-allocate(hamd(no,ndim))
-
-ii=0
-do i=1,ndimr
- if (nx(i).ne.0) then
-   ii=ii+1
-!  do j=1,dim_base
-      hamd(ii,:)=d1(i,:)
-!  enddo
- endif
-enddo
-
-!write(99,*)' '
-!write(99,*)' D matrix reduced rows'
-!do i=1,dim_ind
-! write(99,'(1000f15.10)')(hamd(i,j),j=1,dim_base)
-!enddo
-
-write(*,*)' check dim_ind =',ii
-write(*,*)'X calculation'
-
-allocate(xr(ndim,no))
-!  X=DC
-
-call dgemm('T','N',ndim,no,no,1.0d0,hamd,no,vr,no,0.d0,xr,ndim)
-
-!write(998,*)' '
-!write(998,*)' X matrix'
-!do i=1,ndim
-! write(998,'(1000f15.10)')(xr(i,j),j=1,no)
-!enddo
-
-
-call normalize_c(no,ndim,ndimr,vr,xr,mxtr,nx,jcal)
-
-
-! test  C^T (AD) C
-deallocate(amatr)
-allocate(amatr(no,no))
-amatr=0.0d0
-
-call dgemm('N','N',no,no,no,1.d0,h_orig,no,vr,no,0.d0,amatr,no)
-h_orig=0.d0
-call dgemm('T','N',no,no,no,1.d0,vr,no,amatr,no,0.d0,h_orig,no)
-
-iout=0
-if (iout.eq.1) then
- write(998,*)
- write(998,*)'******** check  C^T (AD) C *************'
- write(998,*)
- do i=1,no
-   write(998,'(1000f11.6)')(h_orig(i,j),j=1,no)
- enddo
-endif  
-
-!  copy of <spur| H | phys > correction 
-
-allocate(h_corr(no,ns))
-
-do i=1,no
-  do j=1,ns
-    h_corr(i,j)=h_orig(i,j)
-  enddo
-enddo
-
-
-
-
-
-amatr=0.d0
-
-call dgemm('N','N',no,no,no,1.d0,d_orig,no,vr,no,0.d0,amatr,no)
-h_orig=0.d0
-call dgemm('T','N',no,no,no,1.d0,vr,no,amatr,no,0.d0,d_orig,no)
-
-iout=0
-if (iout.eq.1) then
- write(998,*)
- write(998,*)'******** check  C^T (D) C *************'
- write(998,*)
- do i=1,no
-   write(998,'(1000f11.6)')(d_orig(i,j),j=1,no)
- enddo
-endif      
-
-
-deallocate(h_orig,d_orig,amatr) 
-
-
-!write(998,*)' '
-!write(998,*)' C matrix normalized'
-!do i=1,no
-! write(998,'(1000f15.10)')(vr(i,j),j=1,no)
-!enddo
-
-!ns=0
-
-!write(998,*) 'energies '
-!write(998,'(1000f15.10)')(wr(i),i=1,no-ns)
-!write(998,*)' '
-!write(998,*)' X matrix normalized'
-!do i=1,ndim
-! write(998,'(1000f15.10)')(xr(i,j),j=1,no-ns)
-!enddo
-
-!allocate(ind_red_ind(dim_ind))
-
-!ii=0
-!do i=1,dim_baser
-!if (nx(i).eq.1) then
-!ii=ii+1
-!ind_red_ind(ii)=ind_red(i)
-!endif
-!enddo
-
-
-return            
-end subroutine ham
 
 subroutine ham_geev(ndim,ndimr,no,nor,ns,irow,wr,xr,vr,ipar,jcal,mxtr,phonbs,nx,h_corr)
 
@@ -578,7 +76,15 @@ subroutine ham_geev(ndim,ndimr,no,nor,ns,irow,wr,xr,vr,ipar,jcal,mxtr,phonbs,nx,
 !       read(6)(d1(iii,jjj),jjj=1,ndimt)
 !      enddo
 
-  call read_admatr('./scratch/d_mat_',d1,ndimr,ndim)
+
+  time_est = SECNDS(0.0)
+  write(*,*)' Reading D'
+  call read_admatr_OMP('./scratch/d_mat_',d1,ndimr,ndim)
+  time_run = SECNDS(time_est)
+  print '("Loading time  = ",f15.5," s.")',time_run
+
+
+!  call read_admatr('./scratch/d_mat_',d1,ndimr,ndim)
 
   iout=0
   if (iout.eq.1) then 
@@ -590,34 +96,17 @@ subroutine ham_geev(ndim,ndimr,no,nor,ns,irow,wr,xr,vr,ipar,jcal,mxtr,phonbs,nx,
   enddo
   endif
 
+
+  time_est = SECNDS(0.0)
+  write(*,*)' Reading A'
+  call read_admatr_OMP('./scratch/a_mat_',amatr,ndimr,ndim)
+  time_run = SECNDS(time_est)
+  print '("Loading time  = ",f15.5," s.")',time_run
+
+  write(*,*)'A,D dimensions :', ndim,ndimr
   
-!      do while (.not.eof(6))
-!      read(6)i,j,dd
-!       d1(i,j)=dd
-!      enddo
 
-
-
-!      close(6)
-
- 
-!      open(6,file='a_mat.dat',status='old',form='unformatted')
-
-
-!      read(6)ndimrt,ndimt
-!      if (ndimrt.ne.ndimr.or.ndimt.ne.ndim) then
-!        write(*,*)' Dimensions does not match in A_m file'
-!        stop
-!      endif
-!      do iii=1,ndimrt
-!       read(6)(amatr(iii,jjj),jjj=1,ndimt)
-!      enddo
-
-!      close(6)
-
-  call read_admatr('./scratch/a_mat_',amatr,ndimr,ndim)
-
-  write(*,*)ndim,ndimr
+!  call read_admatr('./scratch/a_mat_',amatr,ndimr,ndim)
 
 
   iout=0
@@ -682,9 +171,23 @@ subroutine ham_geev(ndim,ndimr,no,nor,ns,irow,wr,xr,vr,ipar,jcal,mxtr,phonbs,nx,
    enddo
   enddo
 
+  deallocate(amatr)
+
 !     SVD part 
   call dmat_spur_set(ndim,ndimr,no,phonbs,d1,mxtr,nx,s,vt,ns)
+  write(*,*)'check 1'
 
+allocate(hamd(no,ndim))  
+ii=0
+do i=1,ndimr
+if (nx(i).ne.0) then
+ii=ii+1
+  hamd(ii,:)=d1(i,:)
+endif
+enddo
+
+!deallocate(d1)
+  
 allocate(dmatr(ndimr,ndimr))
 dmatr=0.0d0 
 
@@ -693,9 +196,14 @@ do i=1,ndimr
      dmatr(i,j)=d1(i,mxtr(j))
    enddo
 enddo
+
+deallocate(d1)
   
  call reduce_mat(nx,hami,ndimr,no)
  call reduce_mat(nx,dmatr,ndimr,no)
+
+ write(*,*)'check 2'
+
 
  iout=0
  if (iout.eq.1) then 
@@ -716,20 +224,23 @@ enddo
  endif
 
 !  copies of original AD and D matrices      
-allocate(h_orig(no,no),d_orig(no,no))
+!allocate(h_orig(no,no),d_orig(no,no))
+allocate(h_orig(no,no))
 h_orig=hami
-d_orig=dmatr
+!d_orig=dmatr
 
 
   
 ! transformation of reduced AD
- deallocate(amatr)
+! deallocate(amatr)
  allocate(amatr(no,no))
  amat=0.0d0
 
  call dgemm('N','T',no,no,no,1.d0,hami,no,vt,no,0.d0,amatr,no)
  hami=0.d0
  call dgemm('N','N',no,no,no,1.d0,vt,no,amatr,no,0.d0,hami,no)
+
+ write(*,*)'check 3'
 
 
 do i=1,no
@@ -750,7 +261,7 @@ enddo
  dmatr=0.d0
  call dgemm('N','N',no,no,no,1.d0,vt,no,amatr,no,0.d0,dmatr,no)
 
-
+ write(*,*)'check 4'
 
 ! decoupling spurious subspace     
 
@@ -818,7 +329,7 @@ iout=0
 !    call dsygvx(1,'V', 'V', 'U', no, hami, no, dmatr, no, vl, vu, il, iu, abstol, m, wr, vr, no, work, lwork, lwork, ifail, info)
 
     call dsygv(1, 'V','U', no , hami, no, dmatr, no, wr, work, lwork, info)
-
+    deallocate(dmatr)
 !    write(*,*)' Number of eigevalues is interval (',vl,vu,')  :',m
 
 
@@ -827,32 +338,35 @@ write(99,*)
 !   write(99,*)(wro(i),i=1,no-ns) 
 write(99,*)(wr(i),i=1,no) 
 write(99,*)
-
+write(*,*)' Diagonalisation finished'
 
 
 !   transformation of C to original basis
 
 amatr=0.0d0
-do i=1,ns
+!do i=1,ns
 !vt(i,i)=1.0 !?????? preco
-enddo
+!enddo
 
 call dgemm('T','N',no,no,no,1.d0,vt,no,hami,no,0.d0,amatr,no)   !? spravne
 vr=amatr
+deallocate(amatr,hami,vt)
 !!!!!!!!!!!!!
 ! reduce rows of D
 !deallocate(hamd)
-allocate(hamd(no,ndim))
+!allocate(hamd(no,ndim))
 
-ii=0
-do i=1,ndimr
-if (nx(i).ne.0) then
-ii=ii+1
-!  do j=1,dim_base
-  hamd(ii,:)=d1(i,:)
-!  enddo
-endif
-enddo
+!ii=0
+!do i=1,ndimr
+!if (nx(i).ne.0) then
+!ii=ii+1
+!!  do j=1,dim_base
+!  hamd(ii,:)=d1(i,:)
+!!  enddo
+!endif
+!enddo
+
+!deallocate(d1)
 
 !write(99,*)' '
 !write(99,*)' D matrix reduced rows'
@@ -867,6 +381,7 @@ allocate(xr(ndim,no))
 !  X=DC
 
 call dgemm('T','N',ndim,no,no,1.0d0,hamd,no,vr,no,0.d0,xr,ndim)
+deallocate(hamd)
 
 !write(998,*)' '
 !write(998,*)' X matrix'
@@ -879,13 +394,15 @@ call normalize_c(no,ndim,ndimr,vr,xr,mxtr,nx,jcal)
 
 
 ! test  C^T (AD) C
-deallocate(amatr)
+
 allocate(amatr(no,no))
 amatr=0.0d0
 
 call dgemm('N','N',no,no,no,1.d0,h_orig,no,vr,no,0.d0,amatr,no)
 h_orig=0.d0
 call dgemm('T','N',no,no,no,1.d0,vr,no,amatr,no,0.d0,h_orig,no)
+
+deallocate(amatr)
 
 iout=0
 if (iout.eq.1) then
@@ -919,27 +436,24 @@ do i=1,no
   enddo
 enddo
 
+!amatr=0.d0
+
+!call dgemm('N','N',no,no,no,1.d0,d_orig,no,vr,no,0.d0,amatr,no)
+!h_orig=0.d0
+!call dgemm('T','N',no,no,no,1.d0,vr,no,amatr,no,0.d0,d_orig,no)
+
+!iout=0
+!if (iout.eq.1) then
+!write(998,*)
+!write(998,*)'******** check  C^T (D) C *************'
+!write(998,*)
+!do i=1,no
+!write(998,'(1000f11.6)')(d_orig(i,j),j=1,no)
+!enddo
+!endif      
 
 
-
-amatr=0.d0
-
-call dgemm('N','N',no,no,no,1.d0,d_orig,no,vr,no,0.d0,amatr,no)
-h_orig=0.d0
-call dgemm('T','N',no,no,no,1.d0,vr,no,amatr,no,0.d0,d_orig,no)
-
-iout=0
-if (iout.eq.1) then
-write(998,*)
-write(998,*)'******** check  C^T (D) C *************'
-write(998,*)
-do i=1,no
-write(998,'(1000f11.6)')(d_orig(i,j),j=1,no)
-enddo
-endif      
-
-
-deallocate(h_orig,d_orig,amatr) 
+deallocate(h_orig) 
 
 
 !write(998,*)' '

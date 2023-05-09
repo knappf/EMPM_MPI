@@ -45,15 +45,19 @@
    double precision, dimension (:,:), allocatable :: rtdaovr
    double precision, dimension (:), allocatable :: h_corr
    double precision, dimension (:), allocatable :: a_m,d_m
+   logical, dimension (:), allocatable :: row_calc
 
 
    character*30 namernp,namerpp,namernh,namerph,namefnp,namefpp,namefnh,namefph,namernp1,namerpp1,namernh1,namerph1,namex,namep3
    character(len=100) run_dens2_alpha
    character(len=15)alpha_char
    character*15 row_number
+   character(len=10)myid_name
 
    integer myid,numprocs
 
+    write(myid_name,'(i10.10)')myid
+    open(63,file='ad_calc_myid_'//myid_name,status='unknown',form='formatted')
 
     allocate(rtdaovr(0:5000,0:5000))
     rtdaovr=0.0d0
@@ -90,15 +94,39 @@
     close(2)
  
      no=idphontr
-      
- 
-!      namex='2phonon/2f_x.dat'
-     
-!      if (ifrun.eq.0) then  
-!       call readx(namex,xcc,ndcc,iamax)
-!       call redrsumx(iamax,ilamax,ia,xcc,ndcc,ipozx,ndbx)
-!       ifrun=1
-!      endif
+
+
+    open(62,file='ad_calc.dat',status='unknown',form='formatted')
+
+
+    allocate(row_calc(idphontr))
+
+    ii=0
+!    do while (.not.eof(62))
+!     read(62,*)i
+!     write(*,*)i
+!     ii=ii+1
+!     row_calc(i)=.true.
+!    enddo
+
+    do 
+     read(62,*,iostat=io)i
+!     write(*,*)i
+     if (io > 0) then 
+             write(*,*)'IO error'
+             exit
+     else if (io < 0) then 
+             write(*,*)' IO end of file '
+             exit 
+     endif        
+     ii=ii+1
+     row_calc(i)=.true.
+    enddo
+
+
+    close(62)
+
+    if (myid == 0) write(*,*)'Number of calculated rows:', ii,' total number:',no
 
 
       call loadsp(levn,levp,isi_max)
@@ -174,6 +202,7 @@
 
       do i=1,idphontr
 
+
        iii=mxtr(i)
        iaa=phonbs(iii)%ilap  ! 1phonon index
        ia=phonbs(iii)%ila    ! n-1 phonon index
@@ -199,11 +228,12 @@
      do irs=myid*n_seg+1,min((myid+1)*n_seg,idphontr)
       i=ig_resh(irs)
 
+      if (row_calc(i).eq..false.) then
+
       write(row_number,'(i15.15)')i
       open(6,file='./scratch/a_mat_'//row_number,status='unknown',form='unformatted')
       open(7,file='./scratch/d_mat_'//row_number,status='unknown',form='unformatted')
 
-      
   
        a_m=0.d0
        d_m=0.d0
@@ -432,6 +462,10 @@
 
        close(6)
        close(7)
+
+       write(63,*)i
+
+       endif 
 
       enddo  ! over i
 

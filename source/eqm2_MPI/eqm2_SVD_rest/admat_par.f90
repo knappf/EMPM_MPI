@@ -1,14 +1,8 @@
   module admatr
-  
-   use types_eqm   
-!   include 'types_eqm.inc'
-
 
    contains
 
-!   include 'types_eqm.inc'
-
-   subroutine admat(nf,ipar,jcal,phonbs,ndim,no,phon1,phon2,mxt,myid,numprocs,i_resh)
+   subroutine admat(nf,ipar,jcal,phonbs,ndim,no,phon1,phon2,mxt)
 
    use anglib
    use input_sp
@@ -16,17 +10,13 @@
    implicit double precision (a-h,o-z)
 
 
-!   include 'types_eqm.inc'
+   include 'types_eqm.inc'
 
    integer, dimension (:), allocatable :: phonus, phonmus
-   type(phon_typ), dimension (:), allocatable :: phon1,phon2,phon3
+   type(phon_typ), dimension (:), allocatable :: phon1,phon2
    type(phonbase_typ), dimension (:), allocatable :: phonbs
    type(rho_typ), dimension(:), allocatable :: ronp,ropp,ronh,roph
    type(level_typ),dimension(:), allocatable :: levn,levp
-
-   type (amp2_typ), dimension(:,:), allocatable :: xcc
-   integer, dimension (:), allocatable :: ndcc,ig_resh
-
 
    double precision, dimension(:,:,:,:),allocatable :: ronp1,ropp1,ronh1,roph1
 
@@ -34,41 +24,26 @@
 
    double precision, dimension(:,:,:,:,:), allocatable :: csixj,csixjd
 
-   integer, dimension(:), allocatable :: nx,mxt,mxtr,i_resh
+   integer, dimension(:), allocatable :: nx,mxt,mxtr
 
    integer, dimension (:,:,:), allocatable :: ipozbr
-   integer, dimension (:,:,:), allocatable ::  ipozx
-   integer, dimension (:,:), allocatable ::ndbx
-
-
    integer, dimension (:,:), allocatable :: ndbr
    double precision, dimension (:,:), allocatable :: rtdaovr
-   double precision, dimension (:), allocatable :: h_corr
    double precision, dimension (:), allocatable :: a_m,d_m
 
 
-   character*30 namernp,namerpp,namernh,namerph,namefnp,namefpp,namefnh,namefph,namernp1,namerpp1,namernh1,namerph1,namex,namep3
-   character(len=100) run_dens2_alpha
-   character(len=15)alpha_char
-   character*15 row_number
+   character*30 namernp,namerpp,namernh,namerph,namefnp,namefpp,namefnh,namefph,namernp1,namerpp1,namernh1,namerph1
 
-   integer myid,numprocs
-
-
-    allocate(rtdaovr(0:5000,0:5000))
+    allocate(rtdaovr(5000,5000))
     rtdaovr=0.0d0
-
-    ilamcm=0
-    iii=0
-  
     open(881,file='tda_r_overl.dat',status='unknown',form='formatted')
      do while (.not.eof(881))
-      read(881,*)iii,eee,rr
-    enddo
-    close(881)
+       read(881,*)iii,eee,rr
+     enddo
+      close(881)
 
-    ilamcm=iii
-    if (myid.eq.0) write(*,*)' CM phonon is number ',ilamcm
+      ilamcm=iii
+      write(*,*)' CM phonon is number ',ilamcm
 
      open(881,file='tda_r_overl.dat',status='unknown',form='formatted')
       do while (.not.eof(881))
@@ -76,12 +51,7 @@
        rtdaovr(iii,ilamcm)=rr
        rtdaovr(ilamcm,iii)=rr
       enddo
-     close(881)  
-
-     if (ilamcm.eq.0) rtdaovr=0.0d0 
-     phon1(ilamcm)%enf=rtdaovr(ilamcm,ilamcm)
-     phon2(ilamcm)%enf=rtdaovr(ilamcm,ilamcm)
-      
+     close(881)
 
     open(2,file='mxtr.dat',status='unknown',form='unformatted')
      read(2)idphontr
@@ -90,35 +60,51 @@
     close(2)
  
      no=idphontr
-      
- 
-!      namex='2phonon/2f_x.dat'
-     
-!      if (ifrun.eq.0) then  
-!       call readx(namex,xcc,ndcc,iamax)
-!       call redrsumx(iamax,ilamax,ia,xcc,ndcc,ipozx,ndbx)
-!       ifrun=1
-!      endif
+
+      open(6,file='a_mat.dat',status='unknown',form='unformatted')
+      open(7,file='d_mat.dat',status='unknown',form='unformatted')
 
 
-      call loadsp(levn,levp,isi_max)
+      call loadsp(levn,levp)
 
       namefnp='V_phon_p_n.dat'
       namefpp='V_phon_p_p.dat'
       namefnh='V_phon_h_n.dat'
       namefph='V_phon_h_p.dat'
 
- 
+      if (nf.eq.2) then
+      namerpp='1phonon/1f_rpp.dat'
+      namernp='1phonon/1f_rnp.dat'
+      namerph='1phonon/1f_rph.dat'
+      namernh='1phonon/1f_rnh.dat'
+
+      namernp1='1phonon/1f_rnp1.dat'
+      namerpp1='1phonon/1f_rpp1.dat'
+      namernh1='1phonon/1f_rnh1.dat'
+      namerph1='1phonon/1f_rph1.dat'
+
+      endif
+
+      open(33,file=namernp,status='old',form='unformatted')
+      open(34,file=namerpp,status='old',form='unformatted')
+      open(43,file=namernh,status='old',form='unformatted')
+      open(44,file=namerph,status='old',form='unformatted')
+
+      open(331,file=namefnp,status='old',form='unformatted')
+      open(341,file=namefpp,status='old',form='unformatted')
+      open(431,file=namefnh,status='old',form='unformatted')
+      open(441,file=namefph,status='old',form='unformatted')
+
+      open(332,file=namernp1,status='old',form='unformatted')
+      open(342,file=namerpp1,status='old',form='unformatted')
+      open(432,file=namernh1,status='old',form='unformatted')
+      open(442,file=namerph1,status='old',form='unformatted')
+
       call read_input_par(ihp_min,ihp_max,ihn_min,ihn_max,ipp_min,ipp_max,ipn_min,ipn_max,isi_max,ndla_max)
 
 !      write(*,*)ihp_min,ihp_max,ihn_min,ihn_max,ipp_min,ipp_max,ipn_min,ipn_max,isi_max,ndla_max
       ndla=ndla_max
-      nsi=2*isi_max
-
-      ndla2=ndla_max
-
-!      allocate(h_corr(ndla2))
-
+      nsi=isi_max
 
 !      n1mn=1
 !      n1mx=45
@@ -130,8 +116,7 @@
 
 
       jmx=nsi !20
-    
-      jjmx=17
+
       allocate(csixj(0:jmx,0:jmx,0:jmx,0:jmx,0:jmx))
       csixj=0.0d0
 
@@ -162,107 +147,73 @@
        enddo
       enddo
 
-!      write(6)idphontr,ndim
-!      write(7)idphontr,ndim
-
-
+      write(6)idphontr,ndim
+      write(7)idphontr,ndim
 
       allocate(a_m(ndim),d_m(ndim))
-
-
-
 
       do i=1,idphontr
 
        iii=mxtr(i)
        iaa=phonbs(iii)%ilap  ! 1phonon index
        ia=phonbs(iii)%ila    ! n-1 phonon index
+       write(912,*)' **** ',i,iaa,ia
 
       enddo
 
-      allocate(ig_resh(idphontr))
+
+
       do i=1,idphontr
-       ig_resh(i)=i
-      enddo
-
-      call rperm(idphontr,ig_resh)
-
-    if (mod(idphontr,numprocs).eq.0) then
-            n_seg=idphontr/numprocs
-    else
-            n_seg=idphontr/numprocs+1
-    endif
-
-    if (myid.eq.0) write(*,*) ' size of segment = ',n_seg
-
-
-     do irs=myid*n_seg+1,min((myid+1)*n_seg,idphontr)
-      i=ig_resh(irs)
-
-      write(row_number,'(i15.15)')i
-      open(6,file='./scratch/a_mat_'//row_number,status='unknown',form='unformatted')
-      open(7,file='./scratch/d_mat_'//row_number,status='unknown',form='unformatted')
-
-      
-  
        a_m=0.d0
        d_m=0.d0
 
        iii=mxtr(i)
+       write(725,*)' **** ',i,idphontr
        iaa=phonbs(iii)%ilap  ! 1phonon index
        ia=phonbs(iii)%ila    ! n-1 phonon index
+
+
        jila=phon1(iaa)%j
        jial=phon2(ia)%j
 
 
-
-
-
-
        if (ia.ne.iaold) then
-!            write(*,*)'Reading 2-phon dens',i
-!            write(alpha_char,*)ia
-!            run_dens2_alha='./phon_dens2'//alpha_char
-!            CALL execute_command_line('./phon_dens2'//alpha_char//' > log_dens2 2> error_dens')
-!            CALL execute_command_line('./phon_dens2 $ALPHA_CAL' )
-!            write(*,*)' densities for ia=',ia,'calculated'
+             call readro(33,ia,ronp,nronp)
+             call readro(34,ia,ropp,nropp)
+             call readro(43,ia,ronh,nronh)
+             call readro(44,ia,roph,nroph)
+             iaold=ia
 
+            call redrsum(ndla,ronp,nronp,ropp,nropp,ronh,nronh,roph,nroph,ipozbr,ndbr)
 
-
-            call readro('1f_rnp.dat',ia,ronp,nronp)
-            call readro('1f_rpp.dat',ia,ropp,nropp)
-            call readro('1f_rnh.dat',ia,ronh,nronh)
-            call readro('1f_rph.dat',ia,roph,nroph)
-            iaold=ia
-            call redrsum(ndla2,ronp,nronp,ropp,nropp,ronh,nronh,roph,nroph,ipozbr,ndbr)
 
         endif
 
        if (iaa.ne.iaaold) then
 
-        call readfn('V_phon_p_n',iaa,fnp,ndla,ipn_min,ipn_max,ipn_min,ipn_max,nsi)
-        call readfn('V_phon_p_p',iaa,fpp,ndla,ipp_min,ipp_max,ipp_min,ipp_max,nsi)
-        call readfn('V_phon_h_n',iaa,fnh,ndla,ihn_min,ihn_max,ihn_min,ihn_max,nsi)
-        call readfn('V_phon_h_p',iaa,fph,ndla,ihp_min,ihp_max,ihp_min,ihp_max,nsi)
+        call readfn(331,iaa,fnp,ndla,ipn_min,ipn_max,ipn_min,ipn_max,nsi)
+        call readfn(341,iaa,fpp,ndla,ipp_min,ipp_max,ipp_min,ipp_max,nsi)
+        call readfn(431,iaa,fnh,ndla,ihn_min,ihn_max,ihn_min,ihn_max,nsi)
+        call readfn(441,iaa,fph,ndla,ihp_min,ihp_max,ihp_min,ihp_max,nsi)
 !        iaaold=iaa
 !       endif
 !  
 !       if (iaa.ne.iaaold) then
 
-        call readro11('1f_rnp.dat',iaa,ronp1,ndla,ipn_min,ipn_max,ipn_min,ipn_max,nsi)
-        call readro11('1f_rpp.dat',iaa,ropp1,ndla,ipp_min,ipp_max,ipp_min,ipp_max,nsi)
-        call readro11('1f_rnh.dat',iaa,ronh1,ndla,ihn_min,ihn_max,ihn_min,ihn_max,nsi)
-        call readro11('1f_rph.dat',iaa,roph1,ndla,ihp_min,ihp_max,ihp_min,ihp_max,nsi)
+        call readro11(332,iaa,ronp1,ndla,ipn_min,ipn_max,ipn_min,ipn_max,nsi)
+        call readro11(342,iaa,ropp1,ndla,ipp_min,ipp_max,ipp_min,ipp_max,nsi)
+        call readro11(432,iaa,ronh1,ndla,ihn_min,ihn_max,ihn_min,ihn_max,nsi)
+        call readro11(442,iaa,roph1,ndla,ihp_min,ihp_max,ihp_min,ihp_max,nsi)
 
         iaaold=iaa
        endif
 
-!       call OMP_SET_NUM_THREADS(6)
+       call OMP_SET_NUM_THREADS(5)
 !$omp parallel default(shared) private(jjj,dd,aa, &
 !$omp xsixj,ii,iii,ib,ibb,jlap,jilap,jialp,ibt,i1,i2, &
 !$omp isi,faz,itid,ji1,ji2)
 
-!$omp do schedule (dynamic)
+!$omp do schedule (dynamic,2000)
 
 
        do j=1,ndim
@@ -285,16 +236,13 @@
 !              dd=dd+rtdaovr(ibb)
 !          endif
 
-          if (ia.eq.ib.and.iaa.ne.ibb) then
+          if (ia.eq.ib) then
 !              write(*,*)'***'
              aa=aa+rtdaovr(iaa,ibb)
           endif
-          if (iaa.eq.ibb.and.ia.ne.ib) then
+          if (iaa.eq.ibb) then
 !              write(*,*)'***'
              aa=aa+rtdaovr(ia,ib)
-!            aa=aa+h_corr(ia,ib)
-!            aa=aa+h_corr(ib)
-!            aa=aa+h_corr(ib,ia)
           endif
 
         if (nf.eq.2) then
@@ -310,8 +258,8 @@
           endif
         endif
 
-
          faz1=-1.d0*dfloat((-1)**(jcal+phon1(ibb)%j+phon2(ia)%j))
+
 
 
         do iii=1,ndbr(1,ib)  !nronp          ! neutron particle
@@ -430,8 +378,7 @@
        write(6)(a_m(jjj),jjj=1,ndim)
        write(7)(d_m(jjj),jjj=1,ndim)
 
-       close(6)
-       close(7)
+
 
       enddo  ! over i
 
@@ -455,43 +402,46 @@
       close(6)
       close(7)
 
+
+
       return
 
       end subroutine admat
 
+
+
+
+
+
+
 !*****************************************************************************
-   subroutine readro(fname,ig,ron,ndgg)
+   subroutine readro(ifile,ig,ron,ndgg)
 
       implicit double precision (a-h,o-z)
 
       include 'formats_eqm.inc'
-!!      include 'types_eqm.inc'
+      include 'types_eqm.inc'
 
       type(rho_typ), dimension(:), allocatable :: ron
 
-      character(len=10)fname
-      character(len=4)nlam
-      logical je_tam
+      character(len=30)fname
 
-      ifile=33
- 
-      write(nlam,'(i4.4)')ig
+      rewind(ifile)
 
-      inquire(file='scratch/'//fname//'_'//nlam,exist=je_tam)
-
-      if (je_tam.eq..FALSE.) then
-        write(*,*)'WARNING: ',''//fname//'_'//nlam,' not present!'
-        ndgg=0
-        return
-      endif
-
-
-      open(ifile,file='scratch/'//fname//'_'//nlam,status='unknown',form='unformatted')
-
-      ndro=15000000
+      ndro=5000000
       ndgg=0
 
       if (.not.allocated(ron)) allocate (ron(ndro))
+
+       do igt=1,ig-1
+         read(ifile)igggt,nggt
+         read(ifile)itt
+         read(ifile)itt
+         read(ifile)itt
+         read(ifile)itt
+         read(ifile)xtt
+       enddo
+
 
        read(ifile)igg,ndgg
 
@@ -512,7 +462,6 @@
        read(ifile)(ron(ii)%ro,ii=1,ndgg)
 
 
-       close(ifile)
       return
       end subroutine readro
 
@@ -522,7 +471,7 @@
       implicit double precision (a-h,o-z)
 
       include 'formats_eqm.inc'
-!      include 'types_eqm.inc'
+      include 'types_eqm.inc'
 
       type(rho_typ), dimension(:), allocatable :: ronp,ropp,ronh,roph
       integer, dimension (:,:,:), allocatable :: ipozbr
@@ -530,7 +479,7 @@
 
       character(len=30)fname
 
-      ndipo=20000
+      ndipo=50000
 
       if (.not.allocated(ipozbr)) allocate(ipozbr(4,ifonmx,ndipo))
       ipozbr=0
@@ -593,42 +542,34 @@
 !***********************************************************************
 
 
-      subroutine readro11(fname,ig,ron,ndla,n1mn,n1mx,n2mn,n2mx,nsi)
+      subroutine readro11(ifile,ig,ron,ndla,n1mn,n1mx,n2mn,n2mx,nsi)
 
       implicit double precision (a-h,o-z)
 
-!      include 'types_eqm.inc'
+      include 'types_eqm.inc'
 
       double precision, dimension(:,:,:,:), allocatable :: ron
       type(rho_typ), dimension(:), allocatable :: ronn
-      logical je_tam_subor
 
 
 
-      character(len=10)fname
-      character(len=4)nlam
+      character(len=30)fname
 
-      ifile=33
-      write(nlam,'(i4.4)')ig
+      rewind(ifile)
 
-      inquire(file='scratch/'//fname//'_'//nlam,exist=je_tam_subor)
-
-      if (je_tam_subor.eq..FALSE.) then
-
-       write(*,*)'WARNING: ',''//fname//'_'//nlam,' not present!'
-
-        ndgg=0
-        return
-      endif
-
-
-      open(ifile,file='scratch/'//fname//'_'//nlam,status='unknown',form='unformatted')
-
-
-      ndro=29000000
+      ndro=5000000
       ndgg=0
 
       if (.not.allocated(ronn)) allocate (ronn(ndro))
+
+       do igt=1,ig-1
+         read(ifile)igggt,nggt
+         read(ifile)itt
+         read(ifile)itt
+         read(ifile)itt
+         read(ifile)itt
+         read(ifile)xtt
+       enddo
 
 
        read(ifile)igg,ndgg
@@ -649,7 +590,7 @@
        read(ifile)(ronn(ii)%i2,ii=1,ndgg)
        read(ifile)(ronn(ii)%ro,ii=1,ndgg)
 
-      close(ifile)
+
 
       if (.not.allocated(ron)) allocate(ron(ndla,0:nsi,n1mn:n1mx,n2mn:n2mx))
 
@@ -679,28 +620,32 @@
 
 
 !******************************************************************************
-     subroutine readfn(fname,ig,ron,ndla,n1mn,n1mx,n2mn,n2mx,nsi)
+     subroutine readfn(ifile,ig,ron,ndla,n1mn,n1mx,n2mn,n2mx,nsi)
 
       implicit double precision (a-h,o-z)
 
-!      include 'types_eqm.inc'
+      include 'types_eqm.inc'
 
       double precision, dimension(:,:,:,:), allocatable :: ron
       type(rho_typ), dimension(:), allocatable :: ronn
 
-      character(len=10)fname
-      character(len=4)nlam
+      character(len=30)fname
 
-      ifile=33
+      rewind(ifile)
 
-      write(nlam,'(i4.4)')ig
- 
-      open(ifile,file='scratch/'//fname//'_'//nlam,status='unknown',form='unformatted')
-
-      ndro=29000000
+      ndro=5000000
       ndgg=0
 
       if (.not.allocated(ronn)) allocate (ronn(ndro))
+
+       do igt=1,ig-1
+         read(ifile)igggt,nggt
+         read(ifile)itt
+         read(ifile)itt
+         read(ifile)itt
+         read(ifile)itt
+         read(ifile)xtt
+       enddo
 
        read(ifile)igg,ndgg
 
@@ -719,9 +664,6 @@
        read(ifile)(ronn(ii)%i1,ii=1,ndgg)
        read(ifile)(ronn(ii)%i2,ii=1,ndgg)
        read(ifile)(ronn(ii)%ro,ii=1,ndgg)
-   
-       close(33)
-
 
       if (.not.allocated(ron)) allocate(ron(ndla,0:nsi,n1mn:n1mx,n2mn:n2mx))
 
@@ -736,7 +678,7 @@
         rot=ronn(ii)%ro
 
         if (ibt.gt.ndla.or.isit.gt.nsi.or.i1t.lt.n1mn.or.i1t.gt.n1mx.or.i2t.lt.n2mn.or.i2t.gt.n2mx) then
-         write(*,*)' Small dimensions of ron in readfn',ibt,isit,i1t,i2t,ndla,nsi,n1mn,n1mx,n2mn,n2mx
+         write(*,*)' Small dimensions of ron in readfn',ibt,isit,i1t,i2t
          stop
        endif
 
@@ -754,7 +696,7 @@
 
       implicit double precision (a-h,o-z)
 
-!      include 'types_eqm.inc'
+      include 'types_eqm.inc'
 
       double precision, dimension(:,:,:,:), allocatable :: ron
 
@@ -803,13 +745,14 @@
       end subroutine readf
 !***********************************************************************
 
-      subroutine loadsp(levn,levp,jmax)
+
+      subroutine loadsp(levn,levp)
 
       use input_sp
 
       implicit double precision (a-h,o-z)
 
-!      include 'types_eqm.inc'
+      include 'types_eqm.inc'
       include 'formats_eqm.inc'
 
       type(level_typ),dimension(:), allocatable :: levn,levp
@@ -818,32 +761,23 @@
 !c      write(*,*)'Loading of input '
 
 
-      open(1,file='input_tda_coup.dat',status='old',form='formatted')
+      open(1,file='input_eqm_coup.dat',status='old',form='formatted')
 
       read(1,15)ia,iz
       read(1,15)ihnmn,ihnmx
       read(1,15)ihpmn,ihpmx
       read(1,15)ipnmn,ipnmx
       read(1,15)ippmn,ippmx
-!     read(1,26)alfa,beta
-!     read(1,*)
-!     read(1,15)iparmn,iparmx
-!     read(1,15)jminn,jmaxn
+      read(1,26)alfa,beta
+      read(1,*)
+      read(1,15)iparmn,iparmx
+      read(1,15)jminn,jmaxn
       close(1)
 
       allocate(levn(ipnmx+1000),levp(ippmx+1000))
 
 
       call inp_sp(levn,levp)
-
-      jmax=0
-      do i=1,ippmx
-       if (levp(i)%j.gt.jmax) jmax=levp(i)%j
-      enddo
-
-      do i=1,ipnmx
-       if (levn(i)%j.gt.jmax) jmax=levn(i)%j
-      enddo
 
       end subroutine loadsp
 !
@@ -855,21 +789,23 @@
       character*30 name1f
 
 
-      open(1,file='input_tda_coup.dat',status='old',form='formatted')
+      open(1,file='input_eqm_coup.dat',status='old',form='formatted')
 
       read(1,15)ia,iz
       read(1,15)ihn_min,ihn_max
       read(1,15)ihp_min,ihp_max
       read(1,15)ipn_min,ipn_max
       read(1,15)ipp_min,ipp_max
-!      read(1,26)alfa,beta
-!      read(1,*)
-!      read(1,15)iparmn,iparmx
-!      read(1,15)jminn,jmaxn
+      read(1,26)alfa,beta
+      read(1,*)
+      read(1,15)iparmn,iparmx
+      read(1,15)jminn,jmaxn
       close(1)
 
+      isi_max=jmaxn
 
       name1f='1phonon/1f_states.dat'
+
 
       open (3,file=name1f,status='old',form='unformatted')
 
@@ -881,168 +817,8 @@
 
       close(3)
 
+
       end subroutine read_input_par
 
-!
-      subroutine readx(fname,xcc,ndcc,nd1f,nd2f)
-
-      implicit double precision (a-h,o-z)
-
-!      include 'types_eqm.inc'
-
-      type (amp2_typ), dimension(:,:), allocatable :: xcc
-      integer, dimension (:), allocatable :: ndcc
-
-      character(len=30)fname
-
-!c      allocate(xcc(ndimi,ndimj))
-!c      allocate(ndcc(ndimi))
-
-      open (3,file='1phonon/1f_states.dat',status='old',form='unformatted')
-
-      do while (.not.eof(3))
-       read(3)i,ipart,ijj,en
-      enddo
-      close(3)
-
-      nd1f=i
-      write(*,*)'Number of 1-phonon states', nd1f
-
-
-      open (3,file='2phonon/2f_states.dat',status='old',form='unformatted')
-
-      do while (.not.eof(3))
-       read(3)i,ipart,ijj,en
-      enddo
-      close(3)
-
-      nd2f=i
-      write(*,*)'Number of 2-phonon states', nd2f
-
-
-      open(2,file=fname,status='old',form='unformatted')
-
-      ilamp=0
-
-      ndimj=13000
-
-      allocate(xcc(nd2f,ndimj))
-      allocate(ndcc(nd2f))
-
-
-
-      do while (.not.eof(2))
-
-      read(2)ipar,ijj,no,idphon
-
-!c      if (allocated(xcc).eq..TRUE.) deallocate(xcc,ndcc)
-
-
-      do ilam=1,no
-
-         if (idphon.gt.ndimj) then
-      write(*,*)'Readcam: allocate bigger array in ndimj',idphon,ndimj
-               stop
-           endif
-
-       read(2)(xcc(ilam+ilamp,i)%ig,xcc(ilam+ilamp,i)%is,xcc(ilam+ilamp,i)%am,i=1,idphon)
-       ndcc(ilam+ilamp)=idphon
-      enddo
-
-      ilamps=ilamp
-      ilamp=ilamp+no
-
-!      if (ipar.eq.ipcal.and.ijj.eq.jcal) goto 11
-
-!      deallocate(xcc,ndcc)
-      no=0
-      idphon=0
-
-      enddo
-
-  11  continue
-
-      close(2)
-
-      return
-      end subroutine readx
-!***********************************************************
-      subroutine redrsumx(iamax,ifonmx,xx,ndx,ipozbr,ndbr)
-
-      implicit double precision (a-h,o-z)
-
-      include 'formats_eqm.inc'
-!      include 'types_eqm.inc'
-
-      type (amp2_typ), dimension(:,:), allocatable :: xx
-
-      integer, dimension (:,:,:), allocatable :: ipozbr
-      integer, dimension (:,:), allocatable :: ndbr
-      integer, dimension (:), allocatable :: ndx
-
-
-      character(len=30)fname
-
-      ndipo=100
-
-      if (.not.allocated(ipozbr)) allocate(ipozbr(iamax,ifonmx,ndipo))
-      ipozbr=0
-
-      if (.not.allocated(ndbr)) allocate(ndbr(iamax,ifonmx))
-      ndbr=0
-
-      do ia=1,iamax
-
-!c      write(*,*)'ia =',ia,ndx(ia)
-
-      do i=1,ndx(ia)
-       ibt=xx(ia,i)%is
-!c       write(*,*)i,ibt,ndbr(ia,ibt)
-       ndbr(ia,ibt)=ndbr(ia,ibt)+1
-
-        if (ndbr(ia,ibt).gt.ndipo) then
-               write(*,*)' Increase dimension in redrsumx'
-               stop
-            endif
-       ipozbr(ia,ibt,ndbr(ia,ibt))=i
-      enddo
-
-      enddo
-
-
-      return
-      end subroutine redrsumx
-
-
-!***********************************************************************
-!-----------------------------------------------------------------
-subroutine rperm(N, p)
-
- integer(kind=4), intent(in) :: N
- integer(kind=4), dimension(:), intent(out) :: p
-
- integer(kind=4) :: i
- integer(kind=4) :: k, j, ipj, itemp, m
- real(kind=4), dimension(100) :: u
-
-p = (/ (i, i=1,N) /)
-
-! Generate up to 100 U(0,1) numbers at a time.
-do i=1,N,100
-m = min(N-i+1, 100)
-call random_number(u)
-do j=1,m
-ipj = i+j-1
-k = int(u(j)*(N-ipj+1)) + ipj
-itemp = p(ipj)
-p(ipj) = p(k)
-p(k) = itemp
-end do
-end do
-return
-
-end subroutine rperm
-!--------------------------------------------------------------
-
-
       end module admatr
+

@@ -1,0 +1,52 @@
+# compiler 
+#XLF= ifort -O3 -parallel #-g -traceback #-O3 -parallel -heap-arrays #-qopenmp #-O3 -parallel
+XLF= ifort -g -traceback 
+# options
+OPT= -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
+# exe file
+EXF= eqm_svd
+#
+all: types_eqm.o input_sp.o anglib.o base.o read_admat.o choles.o cm_ort_svd.o ham.o dmat_test.o eqm.o 
+	$(XLF) types_eqm.o input_sp.o anglib.o base.o read_admat.o choles.o cm_ort_svd.o ham.o dmat_test.o eqm.o ${OPT} -o ../${EXF}
+
+types_eqm.o: types_eqm.f90
+	${XLF} -c types_eqm.f90
+
+input_sp.o: input_sp.f90
+	${XLF} -c input_sp.f90
+
+anglib.o: anglib.f90
+	${XLF} -c anglib.f90
+
+base.o: base.f90
+	${XLF} -c base.f90
+
+read_admat.o: read_admat.f90
+	${XLF} -c read_admat.f90	
+
+choles.o: choles.f90
+	${XLF} -c choles.f90
+
+cm_ort_svd.o: cm_ort_svd.f90
+	${XLF} -c cm_ort_svd.f90
+
+#ham_geev_compl.o: ham_geev_compl.f90
+#	${XLF} -c ham_geev_compl.f90
+
+ham.o : ham.f90
+	${XLF} -c ham.f90
+
+dmat_test.o: dmat_test.f
+	${XLF} -c dmat_test.f
+
+eqm.o: eqm.f90
+	${XLF} -c eqm.f90
+
+clean:
+	rm -f *.o *.mod
+	rm -f ${EXF}
+
+
+
+
+	
