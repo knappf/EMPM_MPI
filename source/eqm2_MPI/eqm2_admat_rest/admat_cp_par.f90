@@ -1,5 +1,4 @@
-  module admatr
-  
+module admatr  
    use types_eqm   
 !   include 'types_eqm.inc'
 
@@ -56,6 +55,7 @@
 
    integer myid,numprocs
 
+    write(*,*)' MPI process ',myid 
     write(myid_name,'(i10.10)')myid
     open(63,file='ad_calc_myid_'//myid_name,status='unknown',form='formatted')
 
@@ -74,6 +74,7 @@
     ilamcm=iii
     if (myid.eq.0) write(*,*)' CM phonon is number ',ilamcm
 
+    
      open(881,file='tda_r_overl.dat',status='unknown',form='formatted')
       do while (.not.eof(881))
        read(881,*)iii,eee,rr
@@ -82,6 +83,7 @@
       enddo
      close(881)  
 
+     
      if (ilamcm.eq.0) rtdaovr=0.0d0 
      phon1(ilamcm)%enf=rtdaovr(ilamcm,ilamcm)
      phon2(ilamcm)%enf=rtdaovr(ilamcm,ilamcm)
@@ -93,13 +95,14 @@
      read(2)(mxtr(i),i=1,idphontr)
     close(2)
  
-     no=idphontr
-
+!     no=idphontr
+     
 
     open(62,file='ad_calc.dat',status='unknown',form='formatted')
 
 
     allocate(row_calc(idphontr))
+    row_calc=.false.
 
     ii=0
 !    do while (.not.eof(62))
@@ -108,6 +111,8 @@
 !     ii=ii+1
 !     row_calc(i)=.true.
 !    enddo
+
+    write(*,*)'OK'
 
     do 
      read(62,*,iostat=io)i
@@ -123,11 +128,13 @@
      row_calc(i)=.true.
     enddo
 
+    no=idphontr-ii
 
     close(62)
 
-    if (myid == 0) write(*,*)'Number of calculated rows:', ii,' total number:',no
 
+    if (myid == 0) write(*,*)'Number of calculated rows:', ii,' total number:',idphontr, ' to finish:',no
+  
 
       call loadsp(levn,levp,isi_max)
 
@@ -200,32 +207,41 @@
 
 
 
+!      do i=1,idphontr
+!       iii=mxtr(i)
+!       iaa=phonbs(iii)%ilap  ! 1phonon index
+!       ia=phonbs(iii)%ila    ! n-1 phonon index
+!      enddo
+
+      
+      ii=0
+      allocate(ig_resh(no))
       do i=1,idphontr
-
-
-       iii=mxtr(i)
-       iaa=phonbs(iii)%ilap  ! 1phonon index
-       ia=phonbs(iii)%ila    ! n-1 phonon index
-
+       if (row_calc(i).eq..false.) then 
+           ii=ii+1
+           ig_resh(ii)=i
+       endif
       enddo
 
-      allocate(ig_resh(idphontr))
-      do i=1,idphontr
-       ig_resh(i)=i
-      enddo
+!      write(222,*)(ig_resh(ii),ii=1,no)
+      call random_permutation(ig_resh, no)
+!      call rperm(no,ig_resh)
 
-      call rperm(idphontr,ig_resh)
+!      write(223,*)(ig_resh(ii),ii=1,no)
+!      call rperm(idphontr,ig_resh)
 
-    if (mod(idphontr,numprocs).eq.0) then
-            n_seg=idphontr/numprocs
+     if (myide ==0 ) write(931,*)(ig_resh(i),i=1,no)
+
+    if (mod(no,numprocs).eq.0) then
+            n_seg=no/numprocs
     else
-            n_seg=idphontr/numprocs+1
+            n_seg=no/numprocs+1
     endif
 
-    if (myid.eq.0) write(*,*) ' size of segment = ',n_seg
+    if (myid.eq.0) write(*,*) ' size of segment = ',n_seg,no
 
 
-     do irs=myid*n_seg+1,min((myid+1)*n_seg,idphontr)
+     do irs=myid*n_seg+1,min((myid+1)*n_seg,no)
       i=ig_resh(irs)
 
       if (row_calc(i).eq..false.) then
@@ -1057,13 +1073,13 @@ subroutine rperm(N, p)
 
  integer(kind=4) :: i
  integer(kind=4) :: k, j, ipj, itemp, m
- real(kind=4), dimension(100) :: u
+ real(kind=4), dimension(100000) :: u
 
 p = (/ (i, i=1,N) /)
 
 ! Generate up to 100 U(0,1) numbers at a time.
-do i=1,N,100
-m = min(N-i+1, 100)
+do i=1,N,100000
+m = min(N-i+1, 100000)
 call random_number(u)
 do j=1,m
 ipj = i+j-1
@@ -1077,6 +1093,25 @@ return
 
 end subroutine rperm
 !--------------------------------------------------------------
+
+subroutine random_permutation(arr, n)
+      USE IFPORT
+      implicit none
+      integer, intent(inout) :: arr(:), n
+      integer :: i, j, temp
+    
+      ! Initialize the random number generator
+      call random_seed()
+    
+      ! Generate a random permutation of the array
+      do i = n, 2, -1
+         j = 1 + int(i*rand())
+         temp = arr(i)
+         arr(i) = arr(j)
+         arr(j) = temp
+      end do
+    
+end subroutine random_permutation
 
 
       end module admatr

@@ -1,5 +1,5 @@
 # compiler 
-#XLFMPI= mpiifort -g #-O3 -parallel#-g -debug full #-O3 -parallel
+#XLFMPI= mpifort -g -debug full#-O3 -parallel#-g -debug full #-O3 -parallel
 #XLF=/afs/ics.muni.cz/software/openmpi-1.8.2/intel/bin/mpifort -O3
 # options
 #OPT= -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread

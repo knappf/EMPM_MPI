@@ -102,8 +102,6 @@ do i=1,dim_spur
  enddo
 enddo
 
-deallocate(a,u,d_mat_sp)
-
 
 !write(999,*)
 !write(999,*)' SVD '

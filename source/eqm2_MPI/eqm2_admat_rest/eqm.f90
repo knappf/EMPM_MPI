@@ -1,15 +1,15 @@
-!     last modification 11.5.2018      
-      
+!    last modification 5.5.2023    
       program eqm 
 
       use types_eqm  
       use phonon_base
 !      use metricmat
       use admatr
+      use mpi_f08
 
       implicit double precision (a-h,o-z)
 
-      include 'mpif.h'
+!      include 'mpif.h'
 !      include 'types_eqm.inc'
 
       type(phonbase_typ), dimension (:), allocatable :: phonbs
@@ -84,7 +84,7 @@
 
 !      call rperm(idphontr, i_resh)
 
-        call admat(nf,ipar,jcal,phonbs,idphon,no,phon1,phon2,mxt,myid,numprocs,i_resh)
+      call admat(nf,ipar,jcal,phonbs,idphon,no,phon1,phon2,mxt,myid,numprocs,i_resh)
 
 !       CALL execute_command_line('./run_admat.sh' )
 !       stop

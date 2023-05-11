@@ -249,8 +249,8 @@
 
       write(*,*)'----------------------------------------------'
 
-!      CALL execute_command_line('rm ./scratch/a_mat*')
-!      CALL execute_command_line('rm ./scratch/d_mat*')
+      CALL execute_command_line('rm ./scratch/a_mat*')
+      CALL execute_command_line('rm ./scratch/d_mat*')
       enddo  ! cycle over J
       enddo  ! cycle over parity
 
